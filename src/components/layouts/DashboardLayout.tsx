@@ -1,7 +1,7 @@
 
 import React from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "@/components/dashboard/Navbar";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar";
 import { Home, Users, FileText, Mail, Settings, LogOut } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -9,6 +9,9 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
   // 여기에 사이드바 항목 정의
   const sidebarItems = [
     { icon: <Home size={20} />, label: "대시보드", href: "/" },
@@ -28,17 +31,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <h2 className="text-lg font-medium text-brand-blue mb-4">MAWS</h2>
             <nav>
               <ul className="space-y-1">
-                {sidebarItems.map((item, index) => (
-                  <li key={index}>
-                    <a 
-                      href={item.href}
-                      className="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-brand-lightGray"
-                    >
-                      <span className="text-brand-blue mr-3">{item.icon}</span>
-                      <span>{item.label}</span>
-                    </a>
-                  </li>
-                ))}
+                {sidebarItems.map((item, index) => {
+                  const isActive = currentPath === item.href || 
+                    (item.href !== "/" && currentPath.startsWith(item.href));
+                  
+                  return (
+                    <li key={index}>
+                      <a 
+                        href={item.href}
+                        className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+                          isActive 
+                            ? "bg-brand-blue text-white" 
+                            : "text-gray-700 hover:bg-brand-lightGray"
+                        }`}
+                      >
+                        <span className={isActive ? "text-white" : "text-brand-blue mr-3"}>
+                          {item.icon}
+                        </span>
+                        <span>{item.label}</span>
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
             </nav>
           </div>
