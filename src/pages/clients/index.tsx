@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import { Search, Filter, List, Grid2X2, UserPlus, ChevronDown, Check, Star, MessageSquare, FileText, Edit } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
@@ -139,8 +138,9 @@ const getStatusBadgeVariant = (status: string) => {
   }
 };
 
-const formatDate = (dateString: string, format = "yyyy년 MM월 dd일") => {
-  return dateString ? format(new Date(dateString), format, { locale: ko }) : "-";
+// Fixed: Changed from String object to string function
+const formatDate = (dateString: string, formatString = "yyyy년 MM월 dd일") => {
+  return dateString ? format(new Date(dateString), formatString, { locale: ko }) : "-";
 };
 
 // 최근 방문일 포맷팅 유틸 함수
