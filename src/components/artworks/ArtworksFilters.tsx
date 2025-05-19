@@ -44,14 +44,14 @@ const ArtworksFilters: React.FC<ArtworksFiltersProps> = ({
       {/* 작가 필터 */}
       <div className="w-full md:w-auto">
         <Select
-          value={selectedArtist || ""}
-          onValueChange={(value) => handleArtistChange(value === "" ? null : value)}
+          value={selectedArtist || "all_artists"} 
+          onValueChange={(value) => handleArtistChange(value === "all_artists" ? null : value)}
         >
           <SelectTrigger className="w-full md:w-[180px]">
             <SelectValue placeholder="작가 선택" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">전체 작가</SelectItem>
+            <SelectItem value="all_artists">전체 작가</SelectItem>
             {artistList.map((artist) => (
               <SelectItem key={artist} value={artist}>
                 {artist}
