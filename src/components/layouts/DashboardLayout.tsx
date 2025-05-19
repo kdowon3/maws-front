@@ -2,7 +2,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/dashboard/Navbar";
-import { Home, Users, FileText, Mail, Settings, LogOut } from "lucide-react";
+import { Home, Users, FileText, Mail, Settings, LogOut, PaintBucket } from "lucide-react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,6 +16,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const sidebarItems = [
     { icon: <Home size={20} />, label: "대시보드", href: "/" },
     { icon: <Users size={20} />, label: "고객 관리", href: "/clients" },
+    { icon: <PaintBucket size={20} />, label: "작품 관리", href: "/artworks" },
     { icon: <FileText size={20} />, label: "보증서", href: "/certificates" },
     { icon: <Mail size={20} />, label: "메시지", href: "/messages" },
     { icon: <Settings size={20} />, label: "설정", href: "/settings" }
