@@ -36,7 +36,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
     // 여기에 사이드바 항목 정의
     const sidebarItems = [
-        { icon: <Home size={20} />, label: '대시보드', href: '/' },
+        { icon: <Home size={20} />, label: '대시보드', href: '/dashboard' },
         { icon: <Users size={20} />, label: '고객 관리', href: '/clients' },
         { icon: <FileText size={20} />, label: '작품 관리', href: '/artworks' },
         { icon: <Mail size={20} />, label: '메시지', href: '/messaging' },
