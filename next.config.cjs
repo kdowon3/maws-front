@@ -11,6 +11,13 @@ const nextConfig = {
                 source: '/',
                 destination: '/dashboard',
                 permanent: true,
+                basePath: false,
+            },
+            {
+                source: '/index',
+                destination: '/dashboard',
+                permanent: true,
+                basePath: false,
             },
         ];
     },
