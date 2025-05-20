@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import DashboardLayout from '@/components/layouts/DashboardLayout';
 import PageHeader from '@/components/layouts/PageHeader';
 import ArtworksFilters from '@/components/artworks/ArtworksFilters';
 import ArtworksTable from '@/components/artworks/ArtworksTable';
 import ArtworksPagination from '@/components/artworks/ArtworksPagination';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
 
 import { Artwork, dummyArtworks } from '@/data/artworksData';
@@ -121,50 +121,56 @@ const ArtworksPage: React.FC = () => {
     };
 
     return (
-        <DashboardLayout>
-            <div className="space-y-6">
-                {/* 헤더 영역 */}
-                <PageHeader title="작품 관리" description="등록된 작품을 관리하고 보증서를 발급할 수 있습니다.">
-                    <Button onClick={() => setIsAddArtworkDialogOpen(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        작품 추가
-                    </Button>
-                </PageHeader>
-
-                {/* 필터 및 검색 영역 */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-                    <ArtworksFilters
-                        searchTerm={searchTerm}
-                        handleSearchChange={handleSearchChange}
-                        selectedArtist={selectedArtist}
-                        handleArtistChange={handleArtistChange}
-                        sortBy={sortBy}
-                        handleSortChange={handleSortChange}
-                    />
-                </div>
-
-                {/* 작품 데이터 결과 정보 */}
-                <div className="text-sm text-gray-500">
-                    <span>전체 {filteredArtworks.length}개의 작품</span>
-                </div>
-
-                {/* 데이터 표시 영역 */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-                    <ArtworksTable artworks={displayedArtworks} handleArtworkAction={handleArtworkAction} />
-
-                    {/* 페이지네이션 */}
-                    {filteredArtworks.length > 0 && (
-                        <div className="px-6 py-4 border-t">
-                            <ArtworksPagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                setCurrentPage={setCurrentPage}
-                            />
-                        </div>
-                    )}
-                </div>
+        <div className="space-y-6">
+            {/* 헤더 영역 */}
+            <PageHeader title="작품 관리" description="전시 및 판매 작품을 관리하고 보증서를 발급하세요.">
+                <Dialog open={isAddArtworkDialogOpen} onOpenChange={setIsAddArtworkDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <Plus className="w-4 h-4 mr-2" />
+                            작품 추가
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle>신규 작품 등록</DialogTitle>
+                        </DialogHeader>
+                        {/* 작품 등록 폼을 여기에 삽입 (ArtworksHeader의 폼 부분을 별도 컴포넌트로 분리해 사용하면 좋음) */}
+                        {/* <ArtworkForm onSubmit={handleAddArtwork} /> */}
+                        <div>작품 등록 폼이 여기에 들어갑니다.</div>
+                    </DialogContent>
+                </Dialog>
+            </PageHeader>
+            {/* 필터 및 검색 영역 */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                <ArtworksFilters
+                    searchTerm={searchTerm}
+                    handleSearchChange={handleSearchChange}
+                    selectedArtist={selectedArtist}
+                    handleArtistChange={handleArtistChange}
+                    sortBy={sortBy}
+                    handleSortChange={handleSortChange}
+                />
             </div>
-        </DashboardLayout>
+            {/* 작품 데이터 결과 정보 */}
+            <div className="text-sm text-gray-500">
+                <span>전체 {filteredArtworks.length}개의 작품</span>
+            </div>
+            {/* 데이터 표시 영역 */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+                <ArtworksTable artworks={displayedArtworks} handleArtworkAction={handleArtworkAction} />
+                {/* 페이지네이션 */}
+                {filteredArtworks.length > 0 && (
+                    <div className="px-6 py-4 border-t">
+                        <ArtworksPagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            setCurrentPage={setCurrentPage}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
     );
 };
 

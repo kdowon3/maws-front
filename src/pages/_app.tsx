@@ -3,6 +3,7 @@ import '../App.css';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
+import Head from 'next/head';
 
 export default function App({ Component, pageProps }: AppProps) {
     const router = useRouter();
@@ -13,8 +14,14 @@ export default function App({ Component, pageProps }: AppProps) {
     }
 
     return (
-        <DashboardLayout>
-            <Component {...pageProps} />
-        </DashboardLayout>
+        <>
+            <Head>
+                <title>MAWS</title>
+                <link rel="icon" type="image/svg+xml" href="/로고-removebg-preview.svg" />
+            </Head>
+            <DashboardLayout>
+                <Component {...pageProps} />
+            </DashboardLayout>
+        </>
     );
 }

@@ -1,10 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { List, Grid2X2, Plus } from 'lucide-react';
-import DashboardLayout from '@/components/layouts/DashboardLayout';
-import PageHeader from '@/components/layouts/PageHeader';
-import { Button } from '@/components/ui/button';
+import { List, Grid2X2 } from 'lucide-react';
 
 // 컴포넌트 임포트
+import ClientsHeader from '@/components/clients/ClientsHeader';
 import ClientsFilters from '@/components/clients/ClientsFilters';
 import ClientsTableView from '@/components/clients/ClientsTableView';
 import ClientsCardView from '@/components/clients/ClientsCardView';
@@ -34,9 +32,7 @@ const ClientsPage: React.FC = () => {
                 client.email.includes(searchTerm);
 
             // 작가 필터링
-            const matchesArtist =
-                selectedArtists.length === 0 ||
-                client.favoriteArtists.some((artist) => selectedArtists.includes(artist));
+            const matchesArtist = selectedArtists.length === 0 || selectedArtists.includes(client.favoriteArtist);
 
             // 상태 필터링
             const matchesStatus =
@@ -99,61 +95,51 @@ const ClientsPage: React.FC = () => {
     };
 
     return (
-        <DashboardLayout>
-            <div className="space-y-6">
-                {/* 헤더 영역 */}
-                <PageHeader
-                    title="고객 관리"
-                    description="고객 정보를 관리하고 메시지를 발송할 수 있습니다. 고객의 작품 구매 이력과 선호 작가를 확인할 수 있습니다."
-                >
-                    <Button onClick={() => setIsAddClientDialogOpen(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        고객 추가
-                    </Button>
-                </PageHeader>
+        <div className="space-y-8">
+            {/* 헤더 영역 */}
+            <ClientsHeader
+                isAddClientDialogOpen={isAddClientDialogOpen}
+                setIsAddClientDialogOpen={setIsAddClientDialogOpen}
+                handleAddClient={handleAddClient}
+            />
 
-                {/* 필터 및 검색 영역 */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-                    <ClientsFilters
-                        searchTerm={searchTerm}
-                        handleSearchChange={handleSearchChange}
-                        selectedArtists={selectedArtists}
-                        toggleArtistFilter={toggleArtistFilter}
-                        selectedStatuses={selectedStatuses}
-                        toggleStatusFilter={toggleStatusFilter}
-                        dateRangeFilter={dateRangeFilter}
-                        setDateRangeFilter={setDateRangeFilter}
-                        view={view}
-                        handleViewChange={handleViewChange}
-                    />
-                </div>
+            {/* 필터 및 검색 영역 */}
+            <ClientsFilters
+                searchTerm={searchTerm}
+                handleSearchChange={handleSearchChange}
+                selectedArtists={selectedArtists}
+                toggleArtistFilter={toggleArtistFilter}
+                selectedStatuses={selectedStatuses}
+                toggleStatusFilter={toggleStatusFilter}
+                dateRangeFilter={dateRangeFilter}
+                setDateRangeFilter={setDateRangeFilter}
+                view={view}
+                handleViewChange={handleViewChange}
+            />
 
-                {/* 고객 데이터 결과 정보 */}
-                <div className="text-sm text-gray-500">
-                    <span>전체 {filteredClients.length}명의 고객</span>
-                </div>
-
-                {/* 데이터 표시 영역 */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-                    {view === 'table' ? (
-                        <ClientsTableView clients={displayedClients} handleClientAction={handleClientAction} />
-                    ) : (
-                        <ClientsCardView clients={displayedClients} handleClientAction={handleClientAction} />
-                    )}
-
-                    {/* 페이지네이션 */}
-                    {filteredClients.length > 0 && (
-                        <div className="px-6 py-4 border-t">
-                            <ClientsPagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                setCurrentPage={setCurrentPage}
-                            />
-                        </div>
-                    )}
-                </div>
+            {/* 고객 데이터 결과 정보 */}
+            <div className="text-sm text-gray-500">
+                <span>전체 {filteredClients.length}명의 고객</span>
             </div>
-        </DashboardLayout>
+
+            {/* 데이터 표시 영역 */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+                {view === 'table' ? (
+                    <ClientsTableView clients={displayedClients} handleClientAction={handleClientAction} />
+                ) : (
+                    <ClientsCardView clients={displayedClients} handleClientAction={handleClientAction} />
+                )}
+
+                {/* 페이지네이션 */}
+                {filteredClients.length > 0 && (
+                    <ClientsPagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        setCurrentPage={setCurrentPage}
+                    />
+                )}
+            </div>
+        </div>
     );
 };
 
