@@ -17,7 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <>
             <Head>
                 <title>MAWS</title>
-                <link rel="icon" type="image/svg+xml" href="/로고-removebg-preview.svg" />
+                <link rel="icon" type="image/svg+xml" href="/maws-logo.svg" />
             </Head>
             <DashboardLayout>
                 <Component {...pageProps} />

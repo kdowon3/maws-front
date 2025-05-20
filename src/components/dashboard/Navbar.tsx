@@ -14,7 +14,7 @@ const Navbar = () => {
 
                     <div className="flex items-center">
                         <div className="hidden md:block">
-                            <img src="/로고-removebg-preview.svg" alt="MAWS Logo" className="h-16" />
+                            <img src="/maws-logo.svg" alt="MAWS Logo" className="h-16" />
                         </div>
                     </div>
 

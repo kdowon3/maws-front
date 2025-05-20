@@ -2,6 +2,31 @@
 const nextConfig = {
     reactStrictMode: true,
     swcMinify: true,
+    images: {
+        unoptimized: true,
+    },
+    async rewrites() {
+        return [
+            {
+                source: '/',
+                destination: '/index',
+            },
+        ];
+    },
+    // 정적 파일 제공을 위한 설정
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, immutable',
+                    },
+                ],
+            },
+        ];
+    },
 };
 
 module.exports = nextConfig;
