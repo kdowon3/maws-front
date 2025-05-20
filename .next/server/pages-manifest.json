@@ -1,10 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/messaging": "pages/messaging.js",
-  "/404": "pages/404.js",
-  "/clients": "pages/clients.js",
-  "/artworks": "pages/artworks.js"
-}
+{"/_app":"pages/_app.js","/_error":"pages/_error.js","/404":"pages/404.html","/NotFound":"pages/NotFound.html","/artworks":"pages/artworks.html","/auth/login":"pages/auth/login.html","/clients":"pages/clients.html","/auth/signup":"pages/auth/signup.html","/customer":"pages/customer.html","/dashboard":"pages/dashboard.html","/":"pages/index.html","/messaging/SendMessagePage":"pages/messaging/SendMessagePage.html","/messaging":"pages/messaging.html","/sms":"pages/sms.html","/_document":"pages/_document.js"}
