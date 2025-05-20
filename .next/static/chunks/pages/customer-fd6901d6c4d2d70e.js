@@ -1,1 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[863],{5513:function(n,u,_){(window.__NEXT_P=window.__NEXT_P||[]).push(["/customer",function(){return _(8751)}])},8751:function(n,u,_){"use strict";_.r(u);var t=_(5893);_(7294),u.default=()=>(0,t.jsx)("div",{children:"고객관리 페이지"})}},function(n){n.O(0,[888,774,179],function(){return n(n.s=5513)}),_N_E=n.O()}]);

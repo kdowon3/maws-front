@@ -1,13 +1,14 @@
 import React from 'react';
-import { Calendar, FileText, Mail, UserPlus, Check, Plus, ChevronRight, Bell } from 'lucide-react';
+import { Calendar, FileText, Mail, UserPlus, Check, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import type { NextPage } from 'next';
 
-import MetricCard from '@/components/dashboard/MetricCard';
-import ActionCard from '@/components/dashboard/ActionCard';
-import ActivityLog from '@/components/dashboard/ActivityLog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Navbar from '../../components/dashboard/Navbar';
+import MetricCard from '../../components/dashboard/MetricCard';
+import ActionCard from '../../components/dashboard/ActionCard';
+import ActivityLog from '../../components/dashboard/ActivityLog';
 
-const Dashboard = () => {
+const Dashboard: NextPage = () => {
     const handleAction = (action: string) => {
         toast.success(`${action} 화면으로 이동합니다.`);
     };
@@ -52,96 +53,81 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
-                <div className="mt-4 md:mt-0">
-                    <div className="text-sm text-gray-500">
-                        <span className="font-medium text-brand-blue">
-                            {new Date().toLocaleDateString('ko-KR', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                weekday: 'long',
-                            })}
-                        </span>
+        <div className="min-h-screen bg-brand-lightGray">
+            <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900">대시보드</h1>
+                    <div className="mt-4 md:mt-0">
+                        <div className="text-sm text-gray-500">
+                            <span className="font-medium text-brand-blue">
+                                {new Date().toLocaleDateString('ko-KR', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    weekday: 'long',
+                                })}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <MetricCard
-                    title="신규 고객 수"
-                    value="12"
-                    icon={<UserPlus size={24} />}
-                    change="전월 대비 +3"
-                    trend="up"
-                />
-                <MetricCard
-                    title="문자 발송 수"
-                    value="284"
-                    icon={<Mail size={24} />}
-                    change="전월 대비 +24"
-                    trend="up"
-                />
-                <MetricCard
-                    title="거래 기록 수"
-                    value="56"
-                    icon={<FileText size={24} />}
-                    change="전월 대비 -5"
-                    trend="down"
-                />
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <MetricCard
+                        title="신규 고객 수"
+                        value="12"
+                        icon={<UserPlus size={24} />}
+                        change="전월 대비 +3"
+                        trend="up"
+                    />
+                    <MetricCard
+                        title="문자 발송 수"
+                        value="284"
+                        icon={<Mail size={24} />}
+                        change="전월 대비 +24"
+                        trend="up"
+                    />
+                    <MetricCard
+                        title="거래 기록 수"
+                        value="56"
+                        icon={<FileText size={24} />}
+                        change="전월 대비 -5"
+                        trend="down"
+                    />
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-medium text-gray-900">주요 작업</h2>
-                        <button className="text-sm text-brand-blue flex items-center">
-                            모든 작업 보기
-                            <ChevronRight size={16} className="ml-1" />
-                        </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <ActionCard
-                            title="보증서 발급"
-                            description="작품 정보를 입력하고 보증서를 발급합니다"
-                            icon={<Check size={20} />}
-                            onClick={() => handleAction('보증서 발급')}
-                        />
-                        <ActionCard
-                            title="고객 등록"
-                            description="새로운 고객 정보를 시스템에 등록합니다"
-                            icon={<UserPlus size={20} />}
-                            onClick={() => handleAction('고객 등록')}
-                            variant="secondary"
-                        />
-                        <ActionCard
-                            title="문자 발송"
-                            description="고객에게 안내 문자를 발송합니다"
-                            icon={<Mail size={20} />}
-                            onClick={() => handleAction('문자 발송')}
-                            variant="secondary"
-                        />
-                        <ActionCard
-                            title="작품 등록"
-                            description="새로운 작품 정보를 시스템에 등록합니다"
-                            icon={<Plus size={20} />}
-                            onClick={() => handleAction('작품 등록')}
-                            variant="outline"
-                        />
-                    </div>
-
-                    <div className="mt-8">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-lg font-medium text-gray-900">이번달 주요 지표</h2>
-                            <button className="text-sm text-brand-blue flex items-center">
-                                자세히 보기
-                                <ChevronRight size={16} className="ml-1" />
-                            </button>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2">
+                        <h2 className="text-lg font-medium text-gray-900 mb-4">주요 작업</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <ActionCard
+                                title="보증서 발급"
+                                description="작품 정보를 입력하고 보증서를 발급합니다"
+                                icon={<Check size={20} />}
+                                onClick={() => handleAction('보증서 발급')}
+                            />
+                            <ActionCard
+                                title="고객 등록"
+                                description="새로운 고객 정보를 시스템에 등록합니다"
+                                icon={<UserPlus size={20} />}
+                                onClick={() => handleAction('고객 등록')}
+                            />
+                            <ActionCard
+                                title="문자 발송"
+                                description="고객에게 안내 문자를 발송합니다"
+                                icon={<Mail size={20} />}
+                                onClick={() => handleAction('문자 발송')}
+                            />
+                            <ActionCard
+                                title="작품 등록"
+                                description="새로운 작품 정보를 시스템에 등록합니다"
+                                icon={<Plus size={20} />}
+                                onClick={() => handleAction('작품 등록')}
+                            />
                         </div>
-                        <Card>
-                            <CardContent className="pt-6">
+
+                        <div className="mt-8 pb-6">
+                            <h2 className="text-lg font-medium text-gray-900 mb-4">이번달 주요 지표</h2>
+                            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-100">
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
                                         <h3 className="text-sm font-medium text-gray-500">보증서 발급 횟수</h3>
@@ -160,22 +146,15 @@ const Dashboard = () => {
                                         <p className="mt-2 text-3xl font-bold text-gray-900">3.6억</p>
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div className="lg:col-span-1">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-medium text-gray-900">최근 작업 로그</h2>
-                        <button className="text-sm text-brand-blue flex items-center">
-                            전체 보기
-                            <ChevronRight size={16} className="ml-1" />
-                        </button>
+                    <div className="lg:col-span-1">
+                        <ActivityLog activities={activityLogs} />
                     </div>
-                    <ActivityLog activities={activityLogs} />
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

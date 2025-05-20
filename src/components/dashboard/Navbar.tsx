@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Bell, Search, Menu } from 'lucide-react';
+import Image from 'next/image';
 
 const Navbar = () => {
+    const [imageError, setImageError] = useState(false);
+
     return (
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
             <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,7 +17,19 @@ const Navbar = () => {
 
                     <div className="flex items-center">
                         <div className="hidden md:block">
-                            <img src="/maws-logo.svg" alt="MAWS Logo" className="h-16" />
+                            {!imageError ? (
+                                <Image
+                                    src="/logo.svg"
+                                    alt="MAWS Logo"
+                                    width={120}
+                                    height={48}
+                                    className="h-12 w-auto"
+                                    onError={() => setImageError(true)}
+                                    priority
+                                />
+                            ) : (
+                                <span className="text-xl font-bold text-brand-blue">MAWS</span>
+                            )}
                         </div>
                     </div>
 
