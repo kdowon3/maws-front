@@ -5,25 +5,17 @@ const nextConfig = {
     images: {
         unoptimized: true,
     },
-    async redirects() {
-        return [
-            {
-                source: '/',
-                destination: '/dashboard',
-                permanent: true,
-                basePath: false,
-            },
-            {
-                source: '/index',
-                destination: '/dashboard',
-                permanent: true,
-                basePath: false,
-            },
-        ];
-    },
-    // 정적 파일 제공을 위한 설정
     async headers() {
         return [
+            {
+                source: '/logo.svg',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'no-cache, no-store, must-revalidate',
+                    },
+                ],
+            },
             {
                 source: '/:path*',
                 headers: [

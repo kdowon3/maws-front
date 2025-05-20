@@ -16,6 +16,8 @@ export default function App({ Component, pageProps }: AppProps) {
                 <Head>
                     <title>MAWS - 갤러리 실무 자동화 시스템</title>
                     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+                    <link rel="shortcut icon" type="image/svg+xml" href="/logo.svg" />
+                    <link rel="apple-touch-icon" href="/logo.svg" />
                 </Head>
                 <Component {...pageProps} />
             </>
@@ -27,6 +29,8 @@ export default function App({ Component, pageProps }: AppProps) {
             <Head>
                 <title>MAWS</title>
                 <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+                <link rel="shortcut icon" type="image/svg+xml" href="/logo.svg" />
+                <link rel="apple-touch-icon" href="/logo.svg" />
             </Head>
             <DashboardLayout>
                 <Component {...pageProps} />
