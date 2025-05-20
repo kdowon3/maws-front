@@ -8,7 +8,7 @@ import { Send, Filter, Users, Eye } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CustomerFilterProps {
   selectedCount: number;
@@ -235,7 +235,7 @@ const MessageComposer: React.FC = () => {
 };
 
 const SendMessageInterface: React.FC = () => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
   const [selectedCount, setSelectedCount] = useState(32);
   
   const handleApplyFilters = () => {
