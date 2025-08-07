@@ -40,7 +40,7 @@ const RegisterForm: React.FC = () => {
 
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/accounts/validate-code/`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api'}/accounts/validate-code/`,
                 {
                     method: 'POST',
                     headers: {

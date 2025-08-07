@@ -157,7 +157,7 @@ const QuickSignupForm: React.FC = () => {
 
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/accounts/auth/quick-signup/`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api'}/accounts/auth/quick-signup/`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
