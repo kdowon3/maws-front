@@ -109,8 +109,6 @@ const ArtworksPage: React.FC = () => {
             });
     }, [searchTerm, selectedArtist, sortBy]);
 
-
-
     // 실시간 검색을 위한 디바운스 효과
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -189,7 +187,6 @@ const ArtworksPage: React.FC = () => {
                 search: searchTerm,
                 artist: selectedArtist || undefined,
                 sort: sortBy,
-                page: 1, // 페이지 번호는 서버에서 처리
             });
             setArtworks(newList.results || newList);
         } catch (e) {
@@ -222,7 +219,6 @@ const ArtworksPage: React.FC = () => {
                 search: searchTerm,
                 artist: selectedArtist || undefined,
                 sort: sortBy,
-                page: 1, // 페이지 번호는 서버에서 처리
             });
             setArtworks(newList.results || newList);
         } catch (e) {
@@ -243,7 +239,6 @@ const ArtworksPage: React.FC = () => {
                 search: searchTerm,
                 artist: selectedArtist || undefined,
                 sort: sortBy,
-                page: 1, // 페이지 번호는 서버에서 처리
             });
             setArtworks(newList.results || newList);
         } catch (e) {
@@ -263,7 +258,6 @@ const ArtworksPage: React.FC = () => {
                 search: searchTerm,
                 artist: selectedArtist || undefined,
                 sort: sortBy,
-                page: 1, // 페이지 번호는 서버에서 처리
             });
             setArtworks(newList.results || newList);
         } catch (e) {
@@ -322,18 +316,11 @@ const ArtworksPage: React.FC = () => {
             </div>
             {/* 작품 데이터 결과 정보 */}
             <div className="text-sm text-gray-500">
-                <span>전체 {filteredArtworks.length}개의 작품</span>
+                <span>전체 {artworks.length}개의 작품</span>
             </div>
             {/* 데이터 표시 영역 */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-100">
-                <ArtworksTable artworks={filteredArtworks} handleArtworkAction={handleArtworkAction} />
-                {/* 페이지네이션 */}
-                {filteredArtworks.length > 0 && (
-                    <div className="px-6 py-4 border-t">
-                        {/* TanStack Table의 내장 페이지네이션은 여기에 포함되지 않습니다. */}
-                        {/* 페이지네이션 로직은 서버에서 처리되며, 클라이언트는 현재 페이지의 데이터만 표시합니다. */}
-                    </div>
-                )}
+                <ArtworksTable artworks={artworks} handleArtworkAction={handleArtworkAction} />
             </div>
             {/* 모달 렌더링 */}
             {dialogType === 'edit' && selectedArtwork && (

@@ -173,7 +173,7 @@ const ArtworksTable: React.FC<ArtworksTableProps> = ({ artworks, handleArtworkAc
         getPaginationRowModel: getPaginationRowModel(),
         initialState: {
             pagination: {
-                pageSize: 10,
+                pageSize: 5,
             },
         },
     });
@@ -246,7 +246,7 @@ const ArtworksTable: React.FC<ArtworksTableProps> = ({ artworks, handleArtworkAc
                         }}
                         className="border rounded px-2 py-1 text-sm"
                     >
-                        {[10, 20, 30, 40, 50].map((pageSize) => (
+                        {[5, 10, 20, 30, 40, 50].map((pageSize) => (
                             <option key={pageSize} value={pageSize}>
                                 {pageSize}
                             </option>
