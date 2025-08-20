@@ -1,5 +1,3 @@
-
-
 // 상태별 배지 스타일 정의
 export const getStatusBadgeVariant = (status: string) => {
   switch (status) {

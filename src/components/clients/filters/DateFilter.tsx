@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Filter, ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const DateFilter: React.FC<DateFilterProps> = ({
       </PopoverTrigger>
       <PopoverContent className="w-56">
         <div className="space-y-2">
-          <Button 
+          <Button
             variant={dateRangeFilter === "all" ? "secondary" : "outline"}
             className="w-full justify-start"
             onClick={() => setDateRangeFilter("all")}
@@ -36,23 +35,27 @@ const DateFilter: React.FC<DateFilterProps> = ({
             {dateRangeFilter === "all" && <Check size={16} className="mr-2" />}
             전체 기간
           </Button>
-          <Button 
+          <Button
             variant={dateRangeFilter === "month" ? "secondary" : "outline"}
             className="w-full justify-start"
             onClick={() => setDateRangeFilter("month")}
           >
-            {dateRangeFilter === "month" && <Check size={16} className="mr-2" />}
+            {dateRangeFilter === "month" && (
+              <Check size={16} className="mr-2" />
+            )}
             최근 1개월
           </Button>
-          <Button 
+          <Button
             variant={dateRangeFilter === "quarter" ? "secondary" : "outline"}
             className="w-full justify-start"
             onClick={() => setDateRangeFilter("quarter")}
           >
-            {dateRangeFilter === "quarter" && <Check size={16} className="mr-2" />}
+            {dateRangeFilter === "quarter" && (
+              <Check size={16} className="mr-2" />
+            )}
             최근 3개월
           </Button>
-          <Button 
+          <Button
             variant={dateRangeFilter === "year" ? "secondary" : "outline"}
             className="w-full justify-start"
             onClick={() => setDateRangeFilter("year")}

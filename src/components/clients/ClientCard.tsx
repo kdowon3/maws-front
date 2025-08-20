@@ -1,4 +1,3 @@
-
 import React from "react";
 import { MessageSquare, FileText, Edit, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,8 +42,10 @@ const getStatusBadgeVariant = (status: string) => {
 const formatLastVisit = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-  
+  const diffDays = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
   if (diffDays === 0) {
     return "오늘";
   } else if (diffDays === 1) {
@@ -59,7 +60,9 @@ const formatLastVisit = (dateString: string) => {
 };
 
 const formatDate = (dateString: string, formatStr = "yyyy년 MM월 dd일") => {
-  return dateString ? format(new Date(dateString), formatStr, { locale: ko }) : "-";
+  return dateString
+    ? format(new Date(dateString), formatStr, { locale: ko })
+    : "-";
 };
 
 const ClientCard: React.FC<ClientCardProps> = ({ client, onAction }) => {
@@ -73,15 +76,18 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onAction }) => {
               <p className="text-sm text-gray-500">{client.phone}</p>
             </div>
             <div className="flex gap-1 flex-wrap justify-end">
-              {client.status.map(status => (
-                <Badge key={status} className={`text-xs ${getStatusBadgeVariant(status)}`}>
+              {client.status.map((status) => (
+                <Badge
+                  key={status}
+                  className={`text-xs ${getStatusBadgeVariant(status)}`}
+                >
                   {status === "VIP" && <Star size={12} className="mr-1" />}
                   {status}
                 </Badge>
               ))}
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-2 mt-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-500">이메일</span>
@@ -96,11 +102,11 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onAction }) => {
               <span>{formatDate(client.registrationDate)}</span>
             </div>
           </div>
-          
+
           <div className="mt-3">
             <p className="text-xs text-gray-500 mb-1">관심 작가</p>
             <div className="flex flex-wrap gap-1">
-              {client.favoriteArtists.map(artist => (
+              {client.favoriteArtists.map((artist) => (
                 <Badge key={artist} variant="outline" className="text-xs">
                   {artist}
                 </Badge>
@@ -108,10 +114,10 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onAction }) => {
             </div>
           </div>
         </div>
-        
+
         <div className="border-t border-gray-100 p-2 bg-gray-50 flex justify-around">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => onAction("message", client.id)}
             className="flex-1 py-2"
@@ -120,8 +126,8 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onAction }) => {
             메시지
           </Button>
           <div className="w-px h-8 bg-gray-200 my-auto"></div>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => onAction("warranty", client.id)}
             className="flex-1 py-2"
@@ -130,8 +136,8 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onAction }) => {
             보증서
           </Button>
           <div className="w-px h-8 bg-gray-200 my-auto"></div>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="sm"
             onClick={() => onAction("edit", client.id)}
             className="flex-1 py-2"

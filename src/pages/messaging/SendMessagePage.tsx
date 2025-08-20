@@ -1,8 +1,8 @@
-import React from 'react';
-import SendMessageInterface from '@/components/messaging/SendMessageInterface';
+import React from "react";
+import SendMessageInterface from "@/components/messaging/SendMessageInterface";
 
 const SendMessagePage: React.FC = () => {
-    return <SendMessageInterface />;
+  return <SendMessageInterface />;
 };
 
 export default SendMessagePage;

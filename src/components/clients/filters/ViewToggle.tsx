@@ -1,4 +1,3 @@
-
 import React from "react";
 import { List, Grid2X2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,9 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ view, handleViewChange }) => {
         variant={view === "table" ? "default" : "outline"}
         size="icon"
         onClick={() => handleViewChange("table")}
-        className={view === "table" ? "bg-brand-blue hover:bg-brand-lightBlue" : ""}
+        className={
+          view === "table" ? "bg-brand-blue hover:bg-brand-lightBlue" : ""
+        }
       >
         <List size={18} />
       </Button>
@@ -23,7 +24,9 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ view, handleViewChange }) => {
         variant={view === "card" ? "default" : "outline"}
         size="icon"
         onClick={() => handleViewChange("card")}
-        className={view === "card" ? "bg-brand-blue hover:bg-brand-lightBlue" : ""}
+        className={
+          view === "card" ? "bg-brand-blue hover:bg-brand-lightBlue" : ""
+        }
       >
         <Grid2X2 size={18} />
       </Button>

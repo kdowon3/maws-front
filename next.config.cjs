@@ -6,18 +6,11 @@ const nextConfig = {
         unoptimized: true,
     },
     transpilePackages: ['lucide-react'],
+    experimental: {
+        optimizePackageImports: ['lucide-react'],
+    },
     webpack: (config, { isServer }) => {
-        // lucide-react 모듈 최적화 문제 해결
-        config.resolve.alias = {
-            ...config.resolve.alias,
-        };
-
-        // barrel exports 최적화 비활성화
-        config.optimizePackageImports = config.optimizePackageImports || [];
-        if (!config.optimizePackageImports.includes('lucide-react')) {
-            config.optimizePackageImports.push('lucide-react');
-        }
-
+        // 추가적인 webpack 설정이 필요한 경우 여기에 추가
         return config;
     },
     async headers() {
@@ -54,3 +47,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+

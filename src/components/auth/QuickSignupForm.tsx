@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { usePhoneAuth } from '@/hooks/usePhoneAuth';
+import { useEmailAuth, validateEmail, validateVerificationCode } from '@/hooks/useEmailAuth';
 
 interface QuickSignupFormData {
     gallery_name: string;
@@ -9,8 +9,7 @@ interface QuickSignupFormData {
     last_name: string;
     job_title: string;
     email: string;
-    phone_number: string;
-    firebase_id_token: string;
+    phone: string;
     username: string;
     password: string;
     password_confirm: string;
@@ -22,7 +21,6 @@ interface SignupResponse {
         id: number;
         name: string;
         registration_code: string;
-        verified_phone: string;
     };
     user: {
         id: number;
@@ -43,17 +41,17 @@ const QuickSignupForm: React.FC = () => {
     const [success, setSuccess] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
 
-    // Firebase Phone Auth
+    // Email Auth
     const {
         sendVerificationCode,
         verifyCode,
-        resetRecaptcha,
-        confirmationResult,
-        loading: phoneAuthLoading,
-        error: phoneAuthError,
-    } = usePhoneAuth();
-    const [phoneVerified, setPhoneVerified] = useState(false);
-    const [firebaseIdToken, setFirebaseIdToken] = useState('');
+        resendVerificationCode,
+        resetEmailAuth,
+        loading: emailAuthLoading,
+        error: emailAuthError,
+        codeSent,
+    } = useEmailAuth();
+    const [emailVerified, setEmailVerified] = useState(false);
 
     const [formData, setFormData] = useState<QuickSignupFormData>({
         gallery_name: '',
@@ -61,17 +59,16 @@ const QuickSignupForm: React.FC = () => {
         last_name: '',
         job_title: '',
         email: '',
-        phone_number: '',
-        firebase_id_token: '',
+        phone: '',
         username: '',
         password: '',
         password_confirm: '',
     });
 
-    // 컴포넌트 언마운트 시 reCAPTCHA 정리
+    // 컴포넌트 언마운트 시 이메일 인증 상태 정리
     useEffect(() => {
         return () => {
-            resetRecaptcha();
+            resetEmailAuth();
         };
     }, []);
 
@@ -83,51 +80,41 @@ const QuickSignupForm: React.FC = () => {
         }));
     };
 
-    const formatPhoneNumber = (phone: string) => {
-        const cleaned = phone.replace(/\D/g, '');
-        if (cleaned.length <= 3) return cleaned;
-        if (cleaned.length <= 7) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
-        return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7, 11)}`;
-    };
-
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const formatted = formatPhoneNumber(e.target.value);
-        setFormData((prev) => ({
-            ...prev,
-            phone_number: formatted,
-        }));
-    };
-
-    // Firebase SMS 발송
+    // 이메일 인증번호 발송
     const handleSendVerificationCode = async () => {
-        if (!formData.phone_number) {
-            setError('전화번호를 입력해주세요.');
+        // 인증 절차 임시 보류: 실제 전송 없이 다음 단계로 이동
+        if (!formData.email) {
+            setError('이메일을 입력해주세요.');
+            return;
+        }
+        if (!validateEmail(formData.email)) {
+            setError('올바른 이메일 형식을 입력해주세요.');
             return;
         }
 
         setError('');
-        try {
-            await sendVerificationCode(formData.phone_number, 'recaptcha-container');
-            setSuccess('인증번호가 발송되었습니다.');
-        } catch (error) {
-            console.error('SMS 발송 실패:', error);
-        }
+        // setSuccess('다음 단계로 이동합니다.'); // 안내 문구 임시 비활성화
+        setEmailVerified(true);
+        setStep(2);
     };
 
-    // Firebase 인증 코드 확인
+    // 이메일 인증번호 확인
     const handleVerifyCode = async () => {
         if (!verificationCode) {
             setError('인증번호를 입력해주세요.');
             return;
         }
 
+        if (!validateVerificationCode(verificationCode)) {
+            setError('인증번호는 6자리 숫자여야 합니다.');
+            return;
+        }
+
         setError('');
         try {
-            const result = await verifyCode(verificationCode, formData.phone_number);
-            setPhoneVerified(true);
-            setFirebaseIdToken(result.idToken);
-            setFormData((prev) => ({ ...prev, firebase_id_token: result.idToken }));
-            setSuccess('전화번호 인증이 완료되었습니다!');
+            const result = await verifyCode(formData.email, verificationCode);
+            setEmailVerified(true);
+            setSuccess('이메일 인증이 완료되었습니다!');
 
             // 2초 후 다음 단계로
             setTimeout(() => {
@@ -142,8 +129,8 @@ const QuickSignupForm: React.FC = () => {
     const handleQuickSignup = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!phoneVerified) {
-            setError('전화번호 인증을 먼저 완료해주세요.');
+        if (!emailVerified) {
+            setError('이메일 인증을 먼저 완료해주세요.');
             return;
         }
 
@@ -161,10 +148,7 @@ const QuickSignupForm: React.FC = () => {
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ...formData,
-                        firebase_id_token: firebaseIdToken,
-                    }),
+                    body: JSON.stringify(formData),
                 }
             );
 
@@ -194,11 +178,11 @@ const QuickSignupForm: React.FC = () => {
         }
     };
 
-    // 현재 에러 메시지 (Firebase 에러 우선)
-    const currentError = phoneAuthError || error;
-    const currentLoading = phoneAuthLoading || loading;
+    // 현재 에러 메시지 (이메일 인증 에러 우선)
+    const currentError = emailAuthError || error;
+    const currentLoading = emailAuthLoading || loading;
 
-    // Step 1: 기본 정보 입력 + 전화번호 인증
+    // Step 1: 기본 정보 입력 + 이메일 인증
     if (step === 1) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -206,7 +190,7 @@ const QuickSignupForm: React.FC = () => {
                     <div>
                         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">🎨 갤러리 만들기</h2>
                         <p className="mt-2 text-center text-sm text-gray-600">
-                            갤러리 정보와 전화번호 인증을 완료해주세요
+                            갤러리명, 전화번호, 이메일을 입력하고 인증을 진행해주세요
                         </p>
                     </div>
 
@@ -276,27 +260,23 @@ const QuickSignupForm: React.FC = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                                 전화번호 *
                             </label>
                             <input
-                                id="phone_number"
-                                name="phone_number"
+                                id="phone"
+                                name="phone"
                                 type="tel"
                                 required
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 placeholder="010-1234-5678"
-                                value={formData.phone_number}
-                                onChange={handlePhoneChange}
-                                maxLength={13}
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                value={formData.phone}
+                                onChange={handleChange}
                             />
                         </div>
 
-                        {/* reCAPTCHA 컨테이너 */}
-                        <div id="recaptcha-container" className="flex justify-center"></div>
-
-                        {/* 전화번호 인증 섹션 */}
-                        {!confirmationResult ? (
+                        {/* 이메일 인증 섹션 (임시 보류: 버튼만 다음 단계로 이동) */}
+                        {!codeSent ? (
                             <div>
                                 <button
                                     type="button"
@@ -306,12 +286,12 @@ const QuickSignupForm: React.FC = () => {
                                         !formData.first_name ||
                                         !formData.last_name ||
                                         !formData.email ||
-                                        !formData.phone_number ||
+                                        !formData.phone ||
                                         currentLoading
                                     }
                                     className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {currentLoading ? '발송 중...' : '인증번호 받기'}
+                                    {currentLoading ? '처리 중...' : '다음 단계로'}
                                 </button>
                             </div>
                         ) : (
@@ -339,22 +319,20 @@ const QuickSignupForm: React.FC = () => {
                                 <div>
                                     <button
                                         onClick={handleVerifyCode}
-                                        disabled={currentLoading || verificationCode.length !== 6 || phoneVerified}
+                                        disabled={currentLoading || verificationCode.length !== 6 || emailVerified}
                                         className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {currentLoading ? '인증 중...' : phoneVerified ? '✅ 인증 완료!' : '인증 확인'}
+                                        {currentLoading ? '처리 중...' : '다음 단계로'}
                                     </button>
                                 </div>
 
                                 <div>
                                     <button
-                                        onClick={() => {
-                                            resetRecaptcha();
-                                        }}
+                                        onClick={() => handleSendVerificationCode()}
                                         disabled={currentLoading}
                                         className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        인증번호 재발송
+                                        다시 진행
                                     </button>
                                 </div>
                             </>
@@ -390,11 +368,13 @@ const QuickSignupForm: React.FC = () => {
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">🔐 계정 설정</h2>
                     <p className="mt-2 text-center text-sm text-gray-600">마지막 단계입니다!</p>
-                    {phoneVerified && (
+                    {/* 인증 배너 임시 비활성화
+                    {emailVerified && (
                         <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
-                            <p className="text-sm text-green-800 text-center">✅ 전화번호 인증 완료</p>
+                            <p className="text-sm text-green-800 text-center">✅ 이메일 인증 완료</p>
                         </div>
                     )}
+                    */}
                 </div>
 
                 <form className="mt-8 space-y-6" onSubmit={handleQuickSignup}>
@@ -482,7 +462,7 @@ const QuickSignupForm: React.FC = () => {
 
                         <button
                             type="submit"
-                            disabled={currentLoading || !phoneVerified}
+                            disabled={currentLoading || !emailVerified}
                             className="flex-1 py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {currentLoading ? (

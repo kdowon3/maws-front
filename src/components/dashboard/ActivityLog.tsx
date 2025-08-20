@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
@@ -22,12 +21,18 @@ const ActivityLog: React.FC<ActivityLogProps> = ({ activities }) => {
           {activities.map((activity) => (
             <div key={activity.id} className="py-3">
               <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-900">{activity.action}</span>
-                <span className="text-xs text-gray-500">{activity.timestamp}</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {activity.action}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {activity.timestamp}
+                </span>
               </div>
               <div className="mt-1 text-sm text-gray-500">{activity.user}</div>
               {activity.details && (
-                <div className="mt-1 text-xs text-gray-400">{activity.details}</div>
+                <div className="mt-1 text-xs text-gray-400">
+                  {activity.details}
+                </div>
               )}
             </div>
           ))}

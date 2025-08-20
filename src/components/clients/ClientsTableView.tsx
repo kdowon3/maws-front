@@ -110,3 +110,4 @@ const ClientsTableView: React.FC<ClientsTableViewProps> = ({ clients, handleClie
 };
 
 export default ClientsTableView;
+

@@ -44,18 +44,8 @@ const SignupOptions: React.FC = () => {
 
                                 {/* 설명 */}
                                 <p className="text-sm text-gray-600 text-center leading-relaxed">
-                                    갤러리명과 전화번호만 입력하면
-                                    <br />
-                                    <strong>바로 사용할 수 있어요</strong>
+                                    빠르고 쉽게 갤러리 관리 시작하기
                                 </p>
-
-                                {/* 특징들 */}
-                                <ul className="text-xs text-gray-500 space-y-1">
-                                    <li>✓ 간단한 정보 입력</li>
-                                    <li>✓ 전화번호 인증으로 안전</li>
-                                    <li>✓ 즉시 갤러리 관리 시작</li>
-                                    <li>✓ 14일 무료 체험</li>
-                                </ul>
 
                                 {/* 버튼 */}
                                 <div className="pt-4">

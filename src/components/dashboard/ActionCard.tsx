@@ -1,4 +1,3 @@
-
 import React from "react";
 import { cn } from "@/lib/utils";
 
@@ -10,12 +9,12 @@ interface ActionCardProps {
   variant?: "default" | "secondary" | "outline";
 }
 
-const ActionCard: React.FC<ActionCardProps> = ({ 
-  title, 
-  description, 
-  icon, 
+const ActionCard: React.FC<ActionCardProps> = ({
+  title,
+  description,
+  icon,
   onClick,
-  variant = "default" 
+  variant = "default",
 }) => {
   return (
     <button
@@ -23,17 +22,22 @@ const ActionCard: React.FC<ActionCardProps> = ({
       className={cn(
         "bg-white rounded-lg shadow-sm p-6 border w-full text-left transition-all hover:shadow-md",
         "flex items-center space-x-4",
-        variant === "default" && "border-brand-blue/20 hover:border-brand-blue/40",
+        variant === "default" &&
+          "border-brand-blue/20 hover:border-brand-blue/40",
         variant === "secondary" && "border-gray-100 hover:border-gray-200",
-        variant === "outline" && "border-gray-200 hover:border-gray-300 bg-transparent"
+        variant === "outline" &&
+          "border-gray-200 hover:border-gray-300 bg-transparent",
       )}
     >
-      <div className={cn(
-        "p-3 rounded-md flex items-center justify-center",
-        variant === "default" && "text-brand-blue bg-brand-gray",
-        variant === "secondary" && "text-gray-600 bg-gray-100",
-        variant === "outline" && "text-brand-blue bg-transparent border border-current"
-      )}>
+      <div
+        className={cn(
+          "p-3 rounded-md flex items-center justify-center",
+          variant === "default" && "text-brand-blue bg-brand-gray",
+          variant === "secondary" && "text-gray-600 bg-gray-100",
+          variant === "outline" &&
+            "text-brand-blue bg-transparent border border-current",
+        )}
+      >
         {icon}
       </div>
       <div>

@@ -106,7 +106,9 @@ const ArtworksTable: React.FC<ArtworksTableProps> = ({ artworks, handleArtworkAc
                                     )}
                                 </div>
                             ) : (
-                                <span className="text-gray-400">-</span>
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                                    미지정
+                                </span>
                             )}
                         </div>
                     );
@@ -119,42 +121,43 @@ const ArtworksTable: React.FC<ArtworksTableProps> = ({ artworks, handleArtworkAc
                     const artwork = row.original;
                     return (
                         <div className="flex justify-center gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleArtworkAction('edit', artwork)}>
+                                <Pencil size={18} className="text-gray-500" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleArtworkAction('delete', artwork)}>
+                                <Trash2 size={18} className="text-gray-500" />
+                            </Button>
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
                                             variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleArtworkAction('edit', artwork)}
+                                            size="icon"
+                                            onClick={() => window.open(`/certificate/${artwork.id}`, '_blank')}
+                                            className={
+                                                artwork.buyerId && !artwork.hasMissingFields
+                                                    ? 'text-[#1A2A68]'
+                                                    : 'text-gray-400'
+                                            }
                                         >
-                                            <Pencil className="h-4 w-4" />
+                                            <div className="relative">
+                                                <FileText size={18} className="text-inherit" />
+                                                {artwork.hasMissingFields && (
+                                                    <AlertCircle
+                                                        size={12}
+                                                        className="absolute -top-1 -right-1 text-amber-500"
+                                                    />
+                                                )}
+                                            </div>
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent>수정</TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleArtworkAction('delete', artwork)}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>삭제</TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleArtworkAction('certificate', artwork)}
-                                        >
-                                            <FileText className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>보증서</TooltipContent>
+                                    <TooltipContent>
+                                        {!artwork.buyerId
+                                            ? '구매자 정보가 필요합니다'
+                                            : artwork.hasMissingFields
+                                            ? '필수 필드가 누락되었습니다'
+                                            : '보증서 발급하기'}
+                                    </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
@@ -165,7 +168,6 @@ const ArtworksTable: React.FC<ArtworksTableProps> = ({ artworks, handleArtworkAc
         [handleArtworkAction]
     );
 
-    // TanStack Table 설정
     const table = useReactTable({
         data: artworks,
         columns,
@@ -173,80 +175,91 @@ const ArtworksTable: React.FC<ArtworksTableProps> = ({ artworks, handleArtworkAc
         getPaginationRowModel: getPaginationRowModel(),
         initialState: {
             pagination: {
-                pageSize: 5,
+                pageSize: 10,
             },
         },
     });
 
     return (
-        <div className="overflow-hidden">
-            <table className="w-full">
-                <thead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <tr key={headerGroup.id} className="border-b">
-                            {headerGroup.headers.map((header) => (
-                                <th
-                                    key={header.id}
-                                    className="h-12 px-3 text-left align-middle font-semibold text-gray-800 bg-gray-50"
-                                >
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
-                                </th>
+        <div className="space-y-4">
+            <div className="rounded-md border">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <tr key={headerGroup.id} className="border-b bg-gray-50">
+                                    {headerGroup.headers.map((header) => (
+                                        <th
+                                            key={header.id}
+                                            className="px-4 py-3 text-left text-sm font-medium text-gray-900"
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(header.column.columnDef.header, header.getContext())}
+                                        </th>
+                                    ))}
+                                </tr>
                             ))}
-                        </tr>
-                    ))}
-                </thead>
-                <tbody>
-                    {table.getRowModel().rows.length > 0 ? (
-                        table.getRowModel().rows.map((row) => (
-                            <tr key={row.id} className="border-b transition-colors hover:bg-gray-50/80">
-                                {row.getVisibleCells().map((cell) => (
-                                    <td key={cell.id} className="px-3 py-3 align-middle">
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </thead>
+                        <tbody>
+                            {table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <tr key={row.id} className="border-b hover:bg-gray-50">
+                                        {row.getVisibleCells().map((cell) => (
+                                            <td key={cell.id} className="px-4 py-3 text-sm">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={columns.length} className="text-center py-10 text-gray-500">
+                                        조회된 작품이 없습니다.
                                     </td>
-                                ))}
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={columns.length} className="text-center py-10 text-gray-500">
-                                조회된 작품이 없습니다.
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-
-            {/* TanStack Table 내장 페이지네이션 */}
-            <div className="flex items-center justify-between px-3 py-4">
-                <div className="flex items-center gap-2">
-                    <button
-                        className="px-3 py-1 border rounded disabled:opacity-50"
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                    <p className="text-sm text-gray-700">
+                        총 {table.getFilteredRowModel().rows.length}개 중{' '}
+                        {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
+                        {Math.min(
+                            (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                            table.getFilteredRowModel().rows.length
+                        )}{' '}
+                        개
+                    </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
                         이전
-                    </button>
-                    <span className="text-sm text-gray-600">
-                        {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
-                    </span>
-                    <button
-                        className="px-3 py-1 border rounded disabled:opacity-50"
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
                         다음
-                    </button>
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">페이지당 행:</span>
+                    </Button>
                     <select
                         value={table.getState().pagination.pageSize}
                         onChange={(e) => {
                             table.setPageSize(Number(e.target.value));
                         }}
-                        className="border rounded px-2 py-1 text-sm"
+                        className="border rounded px-2 py-1"
                     >
-                        {[5, 10, 20, 30, 40, 50].map((pageSize) => (
+                        {[10, 20, 30, 40, 50].map((pageSize) => (
                             <option key={pageSize} value={pageSize}>
                                 {pageSize}
                             </option>

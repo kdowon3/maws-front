@@ -1,11 +1,7 @@
 import React from 'react';
 import { ArtworkData } from './index';
 
-interface CaptionTemplate5Props {
-    artwork: ArtworkData;
-}
-
-const CaptionTemplate5: React.FC<CaptionTemplate5Props> = ({ artwork }) => {
+const CaptionTemplate5: React.FC<{ artwork: ArtworkData }> = ({ artwork }) => {
     // 크기 정보 조합
     const width = artwork.width !== undefined && artwork.width !== null ? artwork.width : null;
     const height = artwork.height !== undefined && artwork.height !== null ? artwork.height : null;

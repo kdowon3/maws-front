@@ -1,0 +1,366 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Shield, 
+  BarChart3, 
+  Users, 
+  Building2, 
+  RefreshCw,
+  LogOut,
+  AlertCircle,
+  CheckCircle,
+  Clock
+} from 'lucide-react';
+import { 
+  AdminDashboardStats, 
+  getDashboardStats, 
+  performHealthCheck,
+  refreshCache,
+  logoutAndRedirect 
+} from '@/utils/adminApi';
+import dynamic from 'next/dynamic';
+import MetricCards from './MetricCards';
+
+// 차트 컴포넌트들을 dynamic import로 로드 (SSR 문제 방지)
+const GalleryDistributionChart = dynamic(() => import('./charts/GalleryDistributionChart'), {
+  loading: () => <div className="h-80 bg-gray-100 rounded animate-pulse flex items-center justify-center">차트 로딩 중...</div>,
+  ssr: false
+});
+
+const UsagePatternChart = dynamic(() => import('./charts/UsagePatternChart'), {
+  loading: () => <div className="h-80 bg-gray-100 rounded animate-pulse flex items-center justify-center">차트 로딩 중...</div>,
+  ssr: false
+});
+
+const SecurityStatusChart = dynamic(() => import('./charts/SecurityStatusChart'), {
+  loading: () => <div className="h-80 bg-gray-100 rounded animate-pulse flex items-center justify-center">차트 로딩 중...</div>,
+  ssr: false
+});
+
+import GalleryDetailTable from './tables/GalleryDetailTable';
+import UserDetailTable from './tables/UserDetailTable';
+
+const AdminDashboard: React.FC = () => {
+  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // 현재 사용자 정보 가져오기
+  const getCurrentUser = () => {
+    try {
+      const userData = localStorage.getItem('user_data');
+      if (userData) {
+        const user = JSON.parse(userData);
+        return user.username || '관리자';
+      }
+    } catch (error) {
+      console.error('사용자 데이터 파싱 오류:', error);
+    }
+    return '관리자';
+  };
+
+  // 데이터 로드
+  const loadDashboardData = async () => {
+    try {
+      setError(null);
+      const data = await getDashboardStats();
+      setStats(data);
+      setLastUpdated(new Date().toLocaleString('ko-KR'));
+    } catch (error) {
+      console.error('대시보드 데이터 로딩 오류:', error);
+      setError(error instanceof Error ? error.message : '데이터를 불러오는데 실패했습니다');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 캐시 새로고침
+  const handleRefreshCache = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshCache();
+      await loadDashboardData();
+    } catch (error) {
+      console.error('캐시 새로고침 오류:', error);
+      setError('캐시 새로고침에 실패했습니다');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // 로그아웃 처리
+  const handleLogout = () => {
+    if (confirm('관리자 대시보드에서 로그아웃 하시겠습니까?')) {
+      logoutAndRedirect();
+    }
+  };
+
+  // 컴포넌트 마운트 시 데이터 로드
+  useEffect(() => {
+    loadDashboardData();
+    
+    // 5분마다 자동 새로고침
+    const interval = setInterval(loadDashboardData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* 헤더 */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Shield className="h-8 w-8 text-blue-600" />
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">MAWS 관리자 대시보드</h1>
+                  <p className="text-sm text-gray-500">시스템 운영 및 모니터링</p>
+                </div>
+              </div>
+              {stats?.meta && (
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  {stats.meta.data_privacy}
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-4">
+              {lastUpdated && (
+                <div className="text-sm text-gray-500 flex items-center">
+                  <Clock className="h-4 w-4 mr-1" />
+                  마지막 업데이트: {lastUpdated}
+                </div>
+              )}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefreshCache}
+                disabled={isRefreshing}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? '새로고침 중...' : '새로고침'}
+              </Button>
+
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">관리자: {getCurrentUser()}</span>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  로그아웃
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 에러 메시지 */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="ml-4" 
+                onClick={loadDashboardData}
+              >
+                다시 시도
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* 메인 통계 카드들 */}
+        {stats && (
+          <div className="mb-8">
+            <MetricCards stats={stats} isLoading={isLoading} />
+          </div>
+        )}
+
+        {/* 차트 및 상세 정보 탭 */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="overview" className="flex items-center space-x-2">
+              <BarChart3 className="h-4 w-4" />
+              <span>전체 현황</span>
+            </TabsTrigger>
+            <TabsTrigger value="galleries" className="flex items-center space-x-2">
+              <Building2 className="h-4 w-4" />
+              <span>갤러리 분석</span>
+            </TabsTrigger>
+            <TabsTrigger value="usage" className="flex items-center space-x-2">
+              <BarChart3 className="h-4 w-4" />
+              <span>사용량 패턴</span>
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center space-x-2">
+              <Shield className="h-4 w-4" />
+              <span>보안 현황</span>
+            </TabsTrigger>
+            <TabsTrigger value="gallery-details" className="flex items-center space-x-2">
+              <Building2 className="h-4 w-4" />
+              <span>갤러리 상세</span>
+            </TabsTrigger>
+            <TabsTrigger value="user-details" className="flex items-center space-x-2">
+              <Users className="h-4 w-4" />
+              <span>사용자 상세</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>시스템 요약</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {stats && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {stats.system_overview.active_galleries}
+                          </div>
+                          <div className="text-sm text-blue-800">활성 갤러리</div>
+                          <div className="text-xs text-blue-600">
+                            전체 {stats.system_overview.total_galleries}개 중
+                          </div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600">
+                            {stats.system_overview.galleries_with_clients}
+                          </div>
+                          <div className="text-sm text-green-800">데이터 보유 갤러리</div>
+                          <div className="text-xs text-green-600">
+                            고객 정보를 관리 중
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="pt-4 border-t">
+                        <h4 className="font-medium mb-3">평균 데이터</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>갤러리당 평균 고객 수</span>
+                            <span className="font-medium">
+                              {stats.usage_patterns.average_clients_per_gallery}명
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>갤러리당 평균 작품 수</span>
+                            <span className="font-medium">
+                              {stats.usage_patterns.average_artworks_per_gallery}개
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>갤러리당 평균 사용자 수</span>
+                            <span className="font-medium">
+                              {stats.usage_patterns.average_users_per_gallery}명
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>시스템 상태</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {stats && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <span className="text-green-800 font-medium">시스템 운영 정상</span>
+                        </div>
+                        <Badge variant="outline" className="bg-green-100 text-green-800">
+                          온라인
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>데이터 수집</span>
+                          <span className={stats.collection_success ? 'text-green-600' : 'text-red-600'}>
+                            {stats.collection_success ? '성공' : '실패'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>활성 세션</span>
+                          <span>{stats.security_metrics.session_stats.active_sessions}개</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>24시간 로그인</span>
+                          <span>{stats.security_metrics.login_stats_24h.total_logins}회</span>
+                        </div>
+                      </div>
+
+                      {stats.meta && (
+                        <div className="pt-4 border-t">
+                          <p className="text-xs text-gray-500">
+                            처리 시간: {stats.meta.processing_time_seconds}초 | 
+                            버전: {stats.meta.version}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="galleries">
+            {stats && <GalleryDistributionChart stats={stats} isLoading={isLoading} />}
+          </TabsContent>
+
+          <TabsContent value="usage">
+            {stats && <UsagePatternChart stats={stats} isLoading={isLoading} />}
+          </TabsContent>
+
+          <TabsContent value="security">
+            {stats && <SecurityStatusChart stats={stats} isLoading={isLoading} />}
+          </TabsContent>
+
+          <TabsContent value="gallery-details">
+            {stats && <GalleryDetailTable stats={stats} isLoading={isLoading} />}
+          </TabsContent>
+
+          <TabsContent value="user-details">
+            {stats && <UserDetailTable stats={stats} isLoading={isLoading} />}
+          </TabsContent>
+        </Tabs>
+
+        {/* 푸터 정보 */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="flex items-center justify-between text-sm text-gray-500">
+            <div>
+              <p>MAWS 관리자 대시보드 v1.0.0</p>
+              <p>Zero-Knowledge 아키텍처로 고객 개인정보를 보호합니다</p>
+            </div>
+            <div className="text-right">
+              <p>현재 시간: {new Date().toLocaleString('ko-KR')}</p>
+              <p>서버 시간대: Asia/Seoul</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;

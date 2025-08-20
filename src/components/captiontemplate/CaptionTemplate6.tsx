@@ -1,11 +1,7 @@
 import React from 'react';
 import { ArtworkData } from './index';
 
-interface CaptionTemplate6Props {
-    artwork: ArtworkData;
-}
-
-const CaptionTemplate6: React.FC<CaptionTemplate6Props> = ({ artwork }) => {
+const CaptionTemplate6: React.FC<{ artwork: ArtworkData }> = ({ artwork }) => {
     const getSizeString = () => {
         const width = artwork.width !== undefined && artwork.width !== null ? artwork.width : null;
         const height = artwork.height !== undefined && artwork.height !== null ? artwork.height : null;

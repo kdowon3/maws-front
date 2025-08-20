@@ -27,7 +27,9 @@ const ArtworkForm: React.FC<ArtworkFormProps> = ({
     artistList = [],
     artworkId,
 }) => {
-    const { register, handleSubmit, reset, setValue, watch } = useForm({ defaultValues });
+    const { register, handleSubmit, reset, setValue, watch } = useForm({
+        defaultValues,
+    });
     const [artistInput, setArtistInput] = useState(watch('artist') || defaultValues?.artist || '');
     const [uploading, setUploading] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -125,6 +127,7 @@ const ArtworkForm: React.FC<ArtworkFormProps> = ({
             </div>
             <div>
                 <Label htmlFor="buyer">구매자</Label>
+                {/* 디버깅용: console.log("전달받은 클라이언트 데이터:", clients) */}
                 <Select
                     onValueChange={(value) => setValue('buyer', value)}
                     value={watch('buyer') || defaultValues?.buyer}
@@ -136,7 +139,7 @@ const ArtworkForm: React.FC<ArtworkFormProps> = ({
                         <SelectItem value="none">(없음)</SelectItem>
                         {clients && clients.length > 0 ? (
                             clients.map((client, index) => {
-                                console.log('클라이언트 데이터:', client); // 디버깅용
+                                // 디버깅용: console.log("클라이언트 데이터:", client);
                                 return (
                                     <SelectItem
                                         key={`client-${client.originalId || client.id}-${index}`}

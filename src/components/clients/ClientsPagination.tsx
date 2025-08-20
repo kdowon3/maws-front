@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Pagination,
@@ -25,14 +24,16 @@ const ClientsPagination: React.FC<ClientsPaginationProps> = ({
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious 
+            <PaginationPrevious
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+              className={
+                currentPage === 1 ? "pointer-events-none opacity-50" : ""
+              }
             />
           </PaginationItem>
           {Array.from({ length: totalPages }).map((_, i) => (
             <PaginationItem key={i}>
-              <PaginationLink 
+              <PaginationLink
                 isActive={currentPage === i + 1}
                 onClick={() => setCurrentPage(i + 1)}
               >
@@ -41,9 +42,15 @@ const ClientsPagination: React.FC<ClientsPaginationProps> = ({
             </PaginationItem>
           ))}
           <PaginationItem>
-            <PaginationNext 
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+            <PaginationNext
+              onClick={() =>
+                setCurrentPage(Math.min(totalPages, currentPage + 1))
+              }
+              className={
+                currentPage === totalPages
+                  ? "pointer-events-none opacity-50"
+                  : ""
+              }
             />
           </PaginationItem>
         </PaginationContent>

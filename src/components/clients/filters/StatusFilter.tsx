@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Filter, ChevronDown, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,12 +30,16 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
         <div className="space-y-2">
           {statusOptions.map((status) => (
             <div key={status} className="flex items-center gap-2">
-              <Button 
-                variant={selectedStatuses.includes(status) ? "secondary" : "outline"}
+              <Button
+                variant={
+                  selectedStatuses.includes(status) ? "secondary" : "outline"
+                }
                 className="w-full justify-start"
                 onClick={() => toggleStatusFilter(status)}
               >
-                {selectedStatuses.includes(status) && <Check size={16} className="mr-2" />}
+                {selectedStatuses.includes(status) && (
+                  <Check size={16} className="mr-2" />
+                )}
                 {status}
               </Button>
             </div>

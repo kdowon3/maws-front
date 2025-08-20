@@ -1,2 +1,1 @@
-
-export { default } from './SendMessagePage';
+export { default } from "./SendMessagePage";

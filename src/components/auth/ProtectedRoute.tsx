@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requiredRoles = [],
   requiredPermissions = [],
-  fallbackUrl = '/auth/login',
+  fallbackUrl = "/auth/login",
 }) => {
   const { user, isLoading, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -31,34 +31,45 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     // 로그인했는데 인증이 필요없는 페이지인 경우 (로그인/회원가입 페이지)
     if (!requireAuth && isAuthenticated) {
-      router.push('/dashboard');
+      router.push("/dashboard");
       return;
     }
 
     // 역할 확인
     if (isAuthenticated && user && requiredRoles.length > 0) {
       if (!requiredRoles.includes(user.role)) {
-        router.push('/unauthorized');
+        router.push("/unauthorized");
         return;
       }
     }
 
     // 권한 확인
     if (isAuthenticated && user && requiredPermissions.length > 0) {
-      const hasAllPermissions = requiredPermissions.every(permission => {
+      const hasAllPermissions = requiredPermissions.every((permission) => {
         // 오너는 모든 권한
-        if (user.role === 'owner') return true;
-        
+        if (user.role === "owner") return true;
+
         // 개별 권한 확인
-        return user.permissions[permission as keyof typeof user.permissions] || false;
+        return (
+          user.permissions[permission as keyof typeof user.permissions] || false
+        );
       });
 
       if (!hasAllPermissions) {
-        router.push('/unauthorized');
+        router.push("/unauthorized");
         return;
       }
     }
-  }, [user, isLoading, isAuthenticated, router, requireAuth, requiredRoles, requiredPermissions, fallbackUrl]);
+  }, [
+    user,
+    isLoading,
+    isAuthenticated,
+    router,
+    requireAuth,
+    requiredRoles,
+    requiredPermissions,
+    fallbackUrl,
+  ]);
 
   // 로딩 중일 때
   if (isLoading) {

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -20,7 +19,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   return (
     <div className="relative w-full md:max-w-sm flex gap-2">
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+        <Search
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+          size={18}
+        />
         <Input
           placeholder="고객명, 연락처, 작가명 등 검색..."
           className="pl-10"
