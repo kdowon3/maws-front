@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { X, Check, Plus, ChevronDown } from 'lucide-react';
+import { X, Check, Plus } from 'lucide-react';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -108,230 +108,61 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, initialValues = {}, c
         toast.error('필수 필드를 확인해주세요.');
     };
 
-    // 태그 선택 컴포넌트 (커스텀 드롭다운)
-    const TagSelector = ({ field, label }: { field: any; label: string }) => {
-        const [isOpen, setIsOpen] = useState(false);
-        const [newTagName, setNewTagName] = useState('');
-        const [isCreating, setIsCreating] = useState(false);
-        const dropdownRef = useRef<HTMLDivElement>(null);
+    // 새 태그 생성 상태 (AddRowDialog와 통일)
+    const [isCreatingTag, setIsCreatingTag] = useState(false);
+    const [newTagName, setNewTagName] = useState('');
 
-        const selectedTagId = field.value?.[0]?.id || field.value?.id || null;
-        const selectedTag = availableTags.find((tag) => tag.id === selectedTagId);
+    // 태그 색상 팔레트 (AddRowDialog와 동일)
+    const tagColors = [
+        '#EF4444',
+        '#F97316',
+        '#F59E0B',
+        '#EAB308',
+        '#84CC16',
+        '#22C55E',
+        '#10B981',
+        '#14B8A6',
+        '#06B6D4',
+        '#0EA5E9',
+        '#3B82F6',
+        '#6366F1',
+        '#8B5CF6',
+        '#A855F7',
+        '#D946EF',
+        '#EC4899',
+        '#F43F5E',
+        '#6B7280',
+        '#374151',
+        '#111827',
+    ];
 
-        // 태그 선택 상태 디버깅
-        console.log('🏷️ TagSelector 상태 확인:');
-        console.log('  - field.value:', field.value);
-        console.log('  - selectedTagId:', selectedTagId);
-        console.log('  - selectedTag:', selectedTag);
-        console.log('  - availableTags 개수:', availableTags.length);
-        console.log(
-            '  - availableTags 목록:',
-            availableTags.map((t) => ({ id: t.id, name: t.name }))
-        );
+    // 새 태그 생성 함수 (AddRowDialog와 동일)
+    const handleCreateNewTag = async (colId?: string, field?: any) => {
+        if (!newTagName.trim()) return;
 
-        // 초기값 처리 및 기본 태그 설정
-        useEffect(() => {
-            const handleInitialTags = async () => {
-                // 1. 초기값에 태그가 있는데 availableTags에 없는 경우 처리
-                const initialTag = field.value?.[0];
-                if (initialTag && !selectedTag && availableTags.length > 0) {
-                    console.log('⚠️ 초기값 태그가 availableTags에 없음:', initialTag);
+        try {
+            // 랜덤 색상 선택
+            const randomColor = tagColors[Math.floor(Math.random() * tagColors.length)];
+            const newTag = await createTag(newTagName.trim(), randomColor);
 
-                    // availableTags에 초기값 태그 추가
-                    if (!availableTags.find((t) => t.id === initialTag.id)) {
-                        setAvailableTags((prev) => [...prev, initialTag]);
-                        console.log('✅ 초기값 태그를 availableTags에 추가함:', initialTag);
-                    }
-                }
+            // 새 태그를 목록에 추가
+            setAvailableTags((prev) => [...prev, newTag]);
 
-                // 기본 태그는 백엔드에서 자동 할당됨 (Client.save() 오버라이드)
-            };
-
-            handleInitialTags();
-        }, [availableTags, field]);
-
-        // 태그 색상 팔레트
-        const tagColors = [
-            '#EF4444',
-            '#F97316',
-            '#F59E0B',
-            '#EAB308',
-            '#84CC16',
-            '#22C55E',
-            '#10B981',
-            '#14B8A6',
-            '#06B6D4',
-            '#0EA5E9',
-            '#3B82F6',
-            '#6366F1',
-            '#8B5CF6',
-            '#A855F7',
-            '#D946EF',
-            '#EC4899',
-            '#F43F5E',
-        ];
-
-        // 랜덤 색상 선택 함수
-        const getRandomColor = () => {
-            return tagColors[Math.floor(Math.random() * tagColors.length)];
-        };
-
-        // 외부 클릭 감지
-        useEffect(() => {
-            const handleClickOutside = (event: MouseEvent) => {
-                if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                    setIsOpen(false);
-                }
-            };
-
-            if (isOpen) {
-                document.addEventListener('mousedown', handleClickOutside);
+            // 태그 컬럼이 있으면 자동으로 선택
+            if (field) {
+                field.onChange(newTag);
             }
-            return () => {
-                document.removeEventListener('mousedown', handleClickOutside);
-            };
-        }, [isOpen]);
 
-        // 새 태그 생성
-        const handleCreateNewTag = async () => {
-            if (!newTagName.trim()) return;
+            // 입력 초기화
+            setNewTagName('');
+            setIsCreatingTag(false);
 
-            setIsCreating(true);
-            try {
-                const randomColor = getRandomColor();
-                const newTag = await createTag(newTagName.trim(), randomColor);
-                setAvailableTags((prev) => [...prev, newTag]);
-
-                const newTagValue = [{ id: newTag.id, name: newTag.name, color: newTag.color }];
-                console.log('🏷️ 새 태그 생성 및 선택됨:', newTagValue);
-                field.onChange(newTagValue);
-
-                setNewTagName('');
-                setIsOpen(false);
-                toast.success(`새 태그 "${newTag.name}"가 생성되고 선택되었습니다.`);
-
-                // 폼 값 확인
-                setTimeout(() => {
-                    console.log('🏷️ 새 태그 선택 후 폼 값:', form.getValues());
-                }, 100);
-            } catch (error) {
-                console.error('태그 생성 실패:', error);
-                toast.error('태그 생성에 실패했습니다.');
-            } finally {
-                setIsCreating(false);
-            }
-        };
-
-        return (
-            <FormItem>
-                <FormLabel>{label}</FormLabel>
-                <FormControl>
-                    <div className="relative" ref={dropdownRef}>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="w-full justify-between h-auto min-h-[40px] px-3 py-2"
-                            onClick={() => setIsOpen(!isOpen)}
-                        >
-                            {selectedTag ? (
-                                <div className="flex items-center gap-2">
-                                    <div
-                                        className="w-3 h-3 rounded-full"
-                                        style={{ backgroundColor: selectedTag.color || '#6B7280' }}
-                                    />
-                                    <span>{selectedTag.name}</span>
-                                </div>
-                            ) : (
-                                <span className="text-gray-500">태그를 선택하세요</span>
-                            )}
-                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-
-                        {isOpen && (
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-72 overflow-hidden">
-                                {/* 기존 태그 목록 */}
-                                <div className="max-h-48 overflow-y-auto">
-                                    {availableTags.length > 0 ? (
-                                        availableTags.map((tag) => (
-                                            <button
-                                                key={tag.id}
-                                                type="button"
-                                                className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-50 text-left transition-colors"
-                                                onClick={() => {
-                                                    const newTagValue = [
-                                                        { id: tag.id, name: tag.name, color: tag.color },
-                                                    ];
-                                                    console.log('🏷️ 태그 선택됨:', newTagValue);
-                                                    field.onChange(newTagValue);
-                                                    setIsOpen(false);
-
-                                                    // 폼 값 확인
-                                                    setTimeout(() => {
-                                                        console.log('🏷️ 태그 선택 후 폼 값:', form.getValues());
-                                                    }, 100);
-                                                }}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <div
-                                                        className="w-3 h-3 rounded-full"
-                                                        style={{ backgroundColor: tag.color || '#6B7280' }}
-                                                    />
-                                                    <span>{tag.name}</span>
-                                                </div>
-                                                {selectedTagId === tag.id && (
-                                                    <Check className="h-4 w-4 text-blue-600" />
-                                                )}
-                                            </button>
-                                        ))
-                                    ) : (
-                                        <div className="px-3 py-2 text-sm text-gray-500">
-                                            사용 가능한 태그가 없습니다
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* 새 태그 추가 섹션 - 맨 아래로 이동 */}
-                                <div className="border-t bg-gray-50">
-                                    <div className="p-3">
-                                        <div className="flex gap-2 mb-2">
-                                            <input
-                                                type="text"
-                                                placeholder="새 태그 이름..."
-                                                value={newTagName}
-                                                onChange={(e) => setNewTagName(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        e.preventDefault();
-                                                        handleCreateNewTag();
-                                                    } else if (e.key === 'Escape') {
-                                                        setIsOpen(false);
-                                                    }
-                                                }}
-                                                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                                                autoFocus
-                                            />
-                                            <Button
-                                                type="button"
-                                                size="sm"
-                                                onClick={handleCreateNewTag}
-                                                disabled={!newTagName.trim() || isCreating}
-                                                className="px-3 bg-blue-600 hover:bg-blue-700"
-                                            >
-                                                {isCreating ? '...' : <Plus className="h-4 w-4" />}
-                                            </Button>
-                                        </div>
-                                        <p className="text-xs text-gray-500">
-                                            Enter 키를 누르거나 + 버튼을 클릭하여 새 태그를 생성하세요
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </FormControl>
-                <FormMessage />
-            </FormItem>
-        );
+            console.log('✅ 새 태그 생성 완료:', newTag);
+            toast.success(`새 태그 "${newTag.name}"가 생성되고 선택되었습니다.`);
+        } catch (error) {
+            console.error('❌ 새 태그 생성 실패:', error);
+            toast.error('태그 생성에 실패했습니다.');
+        }
     };
 
     return (
@@ -345,9 +176,148 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, initialValues = {}, c
                                 control={form.control}
                                 name={col.id}
                                 render={({ field }) => {
-                                    // 태그 컬럼인 경우 특별한 UI 제공
-                                    if (col.meta?.type === 'select') {
-                                        return <TagSelector field={field} label={col.header} />;
+                                    // 태그 컬럼인 경우 특별한 UI 제공 (AddRowDialog 스타일로 통일)
+                                    if (
+                                        col.meta?.type === 'select' ||
+                                        col.id === '고객분류' ||
+                                        col.header === '고객분류'
+                                    ) {
+                                        return (
+                                            <FormItem>
+                                                <FormLabel>{col.header}</FormLabel>
+                                                <FormControl>
+                                                    <div className="space-y-3">
+                                                        {/* 태그 선택 뱃지들 - AddRowDialog 방식과 동일 */}
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {availableTags.map((tag) => {
+                                                                const isSelected =
+                                                                    (typeof field.value === 'object' &&
+                                                                        field.value !== null &&
+                                                                        !Array.isArray(field.value) &&
+                                                                        (field.value as any)?.id === tag.id) ||
+                                                                    (Array.isArray(field.value) &&
+                                                                        field.value.length > 0 &&
+                                                                        (field.value[0] as any)?.id === tag.id);
+                                                                return (
+                                                                    <Badge
+                                                                        key={tag.id}
+                                                                        variant={isSelected ? 'default' : 'outline'}
+                                                                        className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
+                                                                            isSelected
+                                                                                ? 'ring-2 ring-offset-1 shadow-md'
+                                                                                : 'hover:shadow-sm'
+                                                                        }`}
+                                                                        style={{
+                                                                            backgroundColor: isSelected
+                                                                                ? tag.color || '#6B7280'
+                                                                                : 'transparent',
+                                                                            borderColor: tag.color || '#6B7280',
+                                                                            color: isSelected
+                                                                                ? '#ffffff'
+                                                                                : tag.color || '#6B7280',
+                                                                            boxShadow: isSelected
+                                                                                ? `0 0 0 2px ${
+                                                                                      tag.color || '#6B7280'
+                                                                                  }40`
+                                                                                : 'none',
+                                                                        }}
+                                                                        onClick={() => {
+                                                                            if (isSelected) {
+                                                                                // 이미 선택된 태그를 클릭하면 선택 해제
+                                                                                field.onChange(null);
+                                                                            } else {
+                                                                                // 새로운 태그 선택
+                                                                                field.onChange(tag);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <div className="flex items-center gap-1.5">
+                                                                            <div
+                                                                                className={`w-2 h-2 rounded-full ${
+                                                                                    isSelected ? 'bg-white' : ''
+                                                                                }`}
+                                                                                style={{
+                                                                                    backgroundColor: isSelected
+                                                                                        ? '#ffffff'
+                                                                                        : tag.color || '#6B7280',
+                                                                                }}
+                                                                            />
+                                                                            {tag.name}
+                                                                        </div>
+                                                                    </Badge>
+                                                                );
+                                                            })}
+
+                                                            {/* 새 태그 추가 UI - AddRowDialog와 동일 */}
+                                                            {!isCreatingTag ? (
+                                                                <Badge
+                                                                    variant="outline"
+                                                                    className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-sm border-dashed text-gray-500 hover:text-gray-700 hover:border-gray-400"
+                                                                    onClick={() => setIsCreatingTag(true)}
+                                                                >
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <Plus className="w-3 h-3" />새 태그
+                                                                    </div>
+                                                                </Badge>
+                                                            ) : (
+                                                                <div className="flex items-center gap-2 p-2 border border-gray-300 rounded bg-white">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={newTagName}
+                                                                        onChange={(e) => setNewTagName(e.target.value)}
+                                                                        placeholder="태그 이름..."
+                                                                        className="px-2 py-1 text-sm border-none outline-none min-w-[100px]"
+                                                                        autoFocus
+                                                                        onKeyPress={(e) => {
+                                                                            if (e.key === 'Enter') {
+                                                                                handleCreateNewTag(col.id, field);
+                                                                            } else if (e.key === 'Escape') {
+                                                                                setIsCreatingTag(false);
+                                                                                setNewTagName('');
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            handleCreateNewTag(col.id, field)
+                                                                        }
+                                                                        className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded"
+                                                                        title="생성"
+                                                                    >
+                                                                        <Check className="w-3 h-3" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setIsCreatingTag(false);
+                                                                            setNewTagName('');
+                                                                        }}
+                                                                        className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded"
+                                                                        title="취소"
+                                                                    >
+                                                                        <X className="w-3 h-3" />
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <p className="text-xs text-gray-500">
+                                                            {field.value
+                                                                ? `"${
+                                                                      (typeof field.value === 'object' &&
+                                                                          field.value !== null &&
+                                                                          !Array.isArray(field.value) &&
+                                                                          (field.value as any)?.name) ||
+                                                                      (Array.isArray(field.value) &&
+                                                                          field.value.length > 0 &&
+                                                                          (field.value[0] as any)?.name)
+                                                                  }" 태그가 선택되었습니다. 다시 클릭하면 선택 해제됩니다.`
+                                                                : '태그를 선택하지 않으면 자동으로 "일반고객" 태그가 할당됩니다.'}
+                                                        </p>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        );
                                     }
 
                                     return (
@@ -437,7 +407,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, initialValues = {}, c
                                 control={form.control}
                                 name="email"
                                 render={({ field }) => (
-                                    <FormItem className="md:col-span-2">
+                                    <FormItem>
                                         <FormLabel>이메일 *</FormLabel>
                                         <FormControl>
                                             <Input
@@ -445,6 +415,143 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, initialValues = {}, c
                                                 {...field}
                                                 value={typeof field.value === 'string' ? field.value : ''}
                                             />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            {/* 고객분류 태그 필드 추가 */}
+                            <FormField
+                                control={form.control}
+                                name="고객분류"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>고객분류</FormLabel>
+                                        <FormControl>
+                                            <div className="space-y-3">
+                                                {/* 태그 선택 뱃지들 - AddRowDialog 방식과 동일 */}
+                                                <div className="flex flex-wrap gap-2">
+                                                    {availableTags.map((tag) => {
+                                                        const isSelected =
+                                                            (typeof field.value === 'object' &&
+                                                                field.value !== null &&
+                                                                !Array.isArray(field.value) &&
+                                                                (field.value as any)?.id === tag.id) ||
+                                                            (Array.isArray(field.value) &&
+                                                                field.value.length > 0 &&
+                                                                (field.value[0] as any)?.id === tag.id);
+                                                        return (
+                                                            <Badge
+                                                                key={tag.id}
+                                                                variant={isSelected ? 'default' : 'outline'}
+                                                                className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
+                                                                    isSelected
+                                                                        ? 'ring-2 ring-offset-1 shadow-md'
+                                                                        : 'hover:shadow-sm'
+                                                                }`}
+                                                                style={{
+                                                                    backgroundColor: isSelected
+                                                                        ? tag.color || '#6B7280'
+                                                                        : 'transparent',
+                                                                    borderColor: tag.color || '#6B7280',
+                                                                    color: isSelected
+                                                                        ? '#ffffff'
+                                                                        : tag.color || '#6B7280',
+                                                                    boxShadow: isSelected
+                                                                        ? `0 0 0 2px ${tag.color || '#6B7280'}40`
+                                                                        : 'none',
+                                                                }}
+                                                                onClick={() => {
+                                                                    if (isSelected) {
+                                                                        // 이미 선택된 태그를 클릭하면 선택 해제
+                                                                        field.onChange(null);
+                                                                    } else {
+                                                                        // 새로운 태그 선택
+                                                                        field.onChange(tag);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <div
+                                                                        className={`w-2 h-2 rounded-full ${
+                                                                            isSelected ? 'bg-white' : ''
+                                                                        }`}
+                                                                        style={{
+                                                                            backgroundColor: isSelected
+                                                                                ? '#ffffff'
+                                                                                : tag.color || '#6B7280',
+                                                                        }}
+                                                                    />
+                                                                    {tag.name}
+                                                                </div>
+                                                            </Badge>
+                                                        );
+                                                    })}
+
+                                                    {/* 새 태그 추가 UI - AddRowDialog와 동일 */}
+                                                    {!isCreatingTag ? (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-sm border-dashed text-gray-500 hover:text-gray-700 hover:border-gray-400"
+                                                            onClick={() => setIsCreatingTag(true)}
+                                                        >
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Plus className="w-3 h-3" />새 태그
+                                                            </div>
+                                                        </Badge>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2 p-2 border border-gray-300 rounded bg-white">
+                                                            <input
+                                                                type="text"
+                                                                value={newTagName}
+                                                                onChange={(e) => setNewTagName(e.target.value)}
+                                                                placeholder="태그 이름..."
+                                                                className="px-2 py-1 text-sm border-none outline-none min-w-[100px]"
+                                                                autoFocus
+                                                                onKeyPress={(e) => {
+                                                                    if (e.key === 'Enter') {
+                                                                        handleCreateNewTag('고객분류', field);
+                                                                    } else if (e.key === 'Escape') {
+                                                                        setIsCreatingTag(false);
+                                                                        setNewTagName('');
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <button
+                                                                onClick={() => handleCreateNewTag('고객분류', field)}
+                                                                className="p-1 text-green-600 hover:text-green-700 hover:bg-green-50 rounded"
+                                                                title="생성"
+                                                            >
+                                                                <Check className="w-3 h-3" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setIsCreatingTag(false);
+                                                                    setNewTagName('');
+                                                                }}
+                                                                className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded"
+                                                                title="취소"
+                                                            >
+                                                                <X className="w-3 h-3" />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <p className="text-xs text-gray-500">
+                                                    {field.value
+                                                        ? `"${
+                                                              (typeof field.value === 'object' &&
+                                                                  field.value !== null &&
+                                                                  !Array.isArray(field.value) &&
+                                                                  (field.value as any)?.name) ||
+                                                              (Array.isArray(field.value) &&
+                                                                  field.value.length > 0 &&
+                                                                  (field.value[0] as any)?.name)
+                                                          }" 태그가 선택되었습니다. 다시 클릭하면 선택 해제됩니다.`
+                                                        : '태그를 선택하지 않으면 자동으로 "일반고객" 태그가 할당됩니다.'}
+                                                </p>
+                                            </div>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -505,4 +612,3 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, initialValues = {}, c
 };
 
 export default ClientForm;
-

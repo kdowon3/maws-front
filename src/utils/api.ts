@@ -272,20 +272,33 @@ export async function updateClient(id: number, data: any) {
   // name, phone, tags 분리하여 일관된 구조로 전송
   const { name, phone, tags, ...rest } = data;
 
-  // 태그 ID 추출 (임시 ID -1 제외)
-  const tagIds = tags
-    ? tags
-        .filter((tag: any) => tag.id !== -1) // 임시 기본 태그 제외
-        .map((tag: any) => (typeof tag === "object" ? tag.id : tag))
-    : [];
+  console.log('🔍 [updateClient] 입력 데이터 분석:', {
+    name, phone, tags, 
+    hasTagsField: 'tags' in data,
+    tagsValue: tags,
+    restKeys: Object.keys(rest)
+  });
 
   // 기존 데이터와 새로운 데이터를 병합 (기존 데이터 보존)
-  const payload = {
+  const payload: any = {
     name: name !== undefined ? name : existingClient.name || "",
     phone: phone !== undefined ? phone : existingClient.phone || "",
-    tag_ids: tagIds,
     data: { ...existingClient.data, ...rest }, // 기존 data와 새로운 data 병합
   };
+
+  // tags가 명시적으로 전달된 경우에만 tag_ids 추가
+  if ('tags' in data && tags !== undefined) {
+    // 태그 ID 추출 (임시 ID -1 제외)
+    const tagIds = tags
+      ? tags
+          .filter((tag: any) => tag.id !== -1) // 임시 기본 태그 제외
+          .map((tag: any) => (typeof tag === "object" ? tag.id : tag))
+      : [];
+    payload.tag_ids = tagIds;
+    console.log('🏷️ [updateClient] 태그 포함하여 전송:', tagIds);
+  } else {
+    console.log('🏷️ [updateClient] 태그 제외하여 전송 (기존 태그 보존)');
+  }
 
   console.log("🔧 updateClient 요청:", {
     id,
@@ -549,4 +562,17 @@ export async function updateClientTagsOnly(clientId: number, tags: any[]) {
   }
 
   return res.json();
+}
+
+// 프론트엔드 로그를 백엔드 터미널에 출력
+export async function logToTerminal(message: string, data?: any, level: string = 'INFO') {
+  try {
+    await authenticatedFetch(`${API_BASE_URL}/debug/log/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, data, level })
+    });
+  } catch (error) {
+    console.error('터미널 로그 전송 실패:', error);
+  }
 }

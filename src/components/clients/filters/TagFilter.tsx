@@ -27,10 +27,12 @@ const TagFilter: React.FC<TagFilterProps> = ({ selectedTags, onTagChange }) => {
     const fetchTags = async () => {
       setLoading(true);
       try {
+        console.log("🏷️ [TagFilter] 태그 목록 새로고침 시작");
         const tags = await getAllTags();
+        console.log("🏷️ [TagFilter] 받은 태그 목록:", tags);
         setAvailableTags(Array.isArray(tags) ? tags : []);
       } catch (error) {
-        console.error("태그 목록 조회 실패:", error);
+        console.error("🏷️ [TagFilter] 태그 목록 조회 실패:", error);
         setAvailableTags([]); // 에러 발생시 빈 배열로 설정
       } finally {
         setLoading(false);
@@ -42,11 +44,21 @@ const TagFilter: React.FC<TagFilterProps> = ({ selectedTags, onTagChange }) => {
   // 전역 태그 변경 이벤트 리스너
   useEffect(() => {
     const handleTagUpdate = () => {
+      console.log("🏷️ [TagFilter] tagUpdated 이벤트 감지됨");
       setRefreshKey((prev) => prev + 1);
     };
 
-    window.addEventListener("tagUpdated", handleTagUpdate);
-    return () => window.removeEventListener("tagUpdated", handleTagUpdate);
+    // 여러 이벤트 이름으로 리스너 등록
+    const events = ["tagUpdated", "tagCreated", "tagDeleted", "tagsChanged"];
+    events.forEach(event => {
+      window.addEventListener(event, handleTagUpdate);
+    });
+
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, handleTagUpdate);
+      });
+    };
   }, []);
 
   // 드롭다운 외부 클릭 감지
