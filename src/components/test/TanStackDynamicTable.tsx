@@ -246,7 +246,7 @@ export default function TanStackDynamicTable({
                         duplicateLogs.push(
                             `🔄 중복 컬럼 교체: ${existing.header} → ${col.header} (order: ${existing.order} → ${col.order})`
                         );
-                        uniqueColumnsMap.set(headerKey, col);
+                        uniqueColumnsMap.set(idKey, col);
                     } else {
                         duplicateLogs.push(
                             `🗑️ 중복 컬럼 제거: ${col.header} (order: ${col.order} vs ${existing.order})`

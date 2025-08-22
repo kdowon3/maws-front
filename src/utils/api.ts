@@ -280,7 +280,7 @@ export async function updateClient(id: number, data: any) {
   });
 
   // 기존 데이터와 새로운 데이터를 병합 (기존 데이터 보존)
-  const payload = {
+  const payload: any = {
     name: name !== undefined ? name : existingClient.name || "",
     phone: phone !== undefined ? phone : existingClient.phone || "",
     data: { ...existingClient.data, ...rest }, // 기존 data와 새로운 data 병합
