@@ -42,7 +42,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         { icon: <Users size={20} />, label: '고객 관리', href: '/clients' },
         { icon: <FileText size={20} />, label: '작품 관리', href: '/artworks' },
         { icon: <Palette size={20} />, label: '전시 준비', href: '/captions' },
-        //{ icon: <Mail size={20} />, label: '메시지', href: '/messaging' },
+        { icon: <Mail size={20} />, label: '메시지', href: '/messaging' },
         //{ icon: <Settings size={20} />, label: '설정', href: '/settings' },
     ];
 

@@ -20,6 +20,9 @@ interface User {
   gallery: {
     id: number;
     name: string;
+    phone?: string;
+    address?: string;
+    email?: string;
     registration_code?: string;
   };
   permissions: {
