@@ -10,7 +10,6 @@ import ClientsHeader from '@/components/clients/ClientsHeader';
 import ClientsFilters from '@/components/clients/ClientsFilters';
 import ClientsTableView from '@/components/clients/ClientsTableView';
 import ClientsCardView from '@/components/clients/ClientsCardView';
-import ClientsPagination from '@/components/clients/ClientsPagination';
 import AddClientDialog from '@/components/clients/AddClientDialog';
 import EditClientDialog from '@/components/clients/EditClientDialog';
 import DeleteClientDialog from '@/components/clients/DeleteClientDialog';
@@ -41,7 +40,6 @@ const ClientsPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [inputValue, setInputValue] = useState('');
     const [selectedTags, setSelectedTags] = useState<any[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
     const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState(false);
     const [dateRangeFilter, setDateRangeFilter] = useState<string>('all'); // all, month, quarter, year
     const [clients, setClients] = useState<any[]>([]);
@@ -118,11 +116,6 @@ const ClientsPage: React.FC = () => {
         });
     }, [data, searchTerm, selectedTags, dateRangeFilter]);
 
-    // 페이지네이션 처리
-    const itemsPerPage = 6;
-    const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
-    const displayedClients = filteredRows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
     // 입력값 변경 (실시간 검색 없음)
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
@@ -131,7 +124,6 @@ const ClientsPage: React.FC = () => {
     // 실제 검색 실행 (엔터나 버튼 클릭시)
     const handleSearch = () => {
         setSearchTerm(inputValue);
-        setCurrentPage(1);
     };
 
     // 엔터 키 처리
@@ -576,8 +568,6 @@ const ClientsPage: React.FC = () => {
         setLoading(true);
         fetchClientsServerSide({
             search: searchTerm,
-
-            page: currentPage,
             // 필요한 추가 필터 파라미터
         })
             .then((data) => {
@@ -628,7 +618,7 @@ const ClientsPage: React.FC = () => {
                 // 클라이언트 데이터에서 작가명 추출 (관심작가명, 구매 작가명 등)
             })
             .catch(console.error);
-    }, [searchTerm, currentPage, columnMapping]);
+    }, [searchTerm, columnMapping]);
 
     if (loading) return <div>로딩 중...</div>;
 
@@ -722,8 +712,6 @@ const ClientsPage: React.FC = () => {
                     }
                 }}
             />
-            {/* 페이지네이션 */}
-            <ClientsPagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
             {/* 모달/다이얼로그 */}
             <EditClientDialog
                 open={editDialogOpen}
