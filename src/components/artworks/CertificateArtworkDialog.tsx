@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CertificateTemplate from "./CertificateTemplate";
 import { Button } from "@/components/ui/button";
+import { getGalleryInfo } from "@/utils/api";
 
 interface CertificateArtworkDialogProps {
   artwork: any;
@@ -25,6 +26,21 @@ const CertificateArtworkDialog: React.FC<CertificateArtworkDialogProps> = ({
   onClose,
   isLoading,
 }) => {
+  const [galleryInfo, setGalleryInfo] = useState<any>(null);
+
+  useEffect(() => {
+    const loadGalleryInfo = async () => {
+      try {
+        const info = await getGalleryInfo();
+        setGalleryInfo(info);
+      } catch (error) {
+        console.error('갤러리 정보 로드 실패:', error);
+      }
+    };
+
+    loadGalleryInfo();
+  }, []);
+
   console.log("artwork.image:", artwork && artwork.image);
   if (!artwork) return null;
   return (
@@ -38,6 +54,21 @@ const CertificateArtworkDialog: React.FC<CertificateArtworkDialogProps> = ({
           size={artwork.dimensions}
           year={artwork.year}
           imageUrl={getFullImageUrl(artwork.image)}
+          galleryLogo={
+            galleryInfo?.logo ? (
+              <img
+                src={galleryInfo.logo}
+                alt={galleryInfo.name}
+                style={{
+                  height: '100px',
+                  maxWidth: '300px',
+                  objectFit: 'contain'
+                }}
+              />
+            ) : (
+              galleryInfo?.name || "갤러리 로고"
+            )
+          }
         />
         <div className="flex justify-end w-full mt-6">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>

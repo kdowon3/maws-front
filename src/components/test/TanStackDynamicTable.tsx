@@ -197,15 +197,11 @@ export default function TanStackDynamicTable({
                 // 필수 컬럼인지 확인 (accessor 기준)
                 const requiredCol = requiredColumns.find((req) => req.accessor === c.accessor);
 
-                console.log(`🔍 서버 컬럼 처리: ID=${c.id}, Header=${c.header}, Accessor=${c.accessor}`);
-
-                // 🔧 accessor와 header가 다른 경우 warning 출력
-                if (c.accessor && c.accessor !== c.header) {
-                    console.warn(`⚠️ accessor와 header 불일치: ${c.header} vs ${c.accessor}`);
-                }
+                // 서버 컬럼 처리
 
                 allColumns.push({
                     id: c.id, // 🔧 DB ID를 직접 사용 (정수형, 안전함)
+                    dbId: c.id, // 🔧 삭제/수정 시 사용할 DB ID 추가
                     header: c.header || '컬럼',
                     meta: { type: c.type || 'text' },
                     accessor: c.accessor, // 🔧 데이터 접근용 accessor
@@ -722,22 +718,9 @@ export default function TanStackDynamicTable({
                         }
                     }
 
-                    // 🔧 데이터 매핑 디버깅 로그 추가
-                    console.log(
-                        `🔍 셀 렌더링: ID=${col.id}, accessor=${col.accessor}, header=${
-                            col.header
-                        }, 값=${value}, 타입=${typeof value}`
-                    );
-                    console.log(`🔍 row.original 샘플:`, {
-                        id: row.original.id,
-                        name: row.original.name,
-                        phone: row.original.phone,
-                        keys: Object.keys(row.original).slice(0, 10), // 처음 10개 키만
-                    });
+                    // 🔧 데이터 매핑 디버깅 로그 제거 (성능 향상)
 
-                    if (value === undefined || value === null) {
-                        console.warn(`⚠️ 빈 값 감지: accessor=${col.accessor}, 헤더=${col.header}`);
-                    }
+                    // 빈 값은 정상적인 경우이므로 로그 제거
 
                     if (col.meta.type === 'checkbox') {
                         return <input type="checkbox" checked={!!value} disabled className="w-5 h-5" />;

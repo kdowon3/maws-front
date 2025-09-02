@@ -576,3 +576,46 @@ export async function logToTerminal(message: string, data?: any, level: string =
     console.error('터미널 로그 전송 실패:', error);
   }
 }
+
+// ===== 갤러리 정보 관리 API =====
+
+export async function getGalleryInfo() {
+  const res = await authenticatedFetch(`${API_BASE_URL}/accounts/gallery/info/`);
+  if (!res.ok) throw new Error("갤러리 정보 조회 실패");
+  const data = await res.json();
+  console.log('[DEBUG API] getGalleryInfo response:', data);
+  return data;
+}
+
+export async function updateGalleryInfo(data: {
+  name?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  business_number?: string;
+} | FormData) {
+  const isFormData = data instanceof FormData;
+  
+  const res = await authenticatedFetch(`${API_BASE_URL}/accounts/gallery/info/`, {
+    method: "PATCH",
+    headers: isFormData ? {} : { "Content-Type": "application/json" },
+    body: isFormData ? data : JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("갤러리 정보 수정 실패");
+  return res.json();
+}
+
+export async function changePassword(data: {
+  old_password: string;
+  new_password: string;
+  new_password_confirm: string;
+}) {
+  const res = await authenticatedFetch(`${API_BASE_URL}/accounts/password/change/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("비밀번호 변경 실패");
+  return res.json();
+}
