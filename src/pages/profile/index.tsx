@@ -185,7 +185,11 @@ export default function ProfilePage() {
   const handlePasswordSubmit = async (data: PasswordForm) => {
     try {
       setLoading(true);
-      await changePassword(data);
+      await changePassword({
+        old_password: data.old_password,
+        new_password: data.new_password,
+        new_password_confirm: data.new_password_confirm,
+      });
       passwordForm.reset();
       toast.success('비밀번호가 성공적으로 변경되었습니다.');
       alert('비밀번호가 성공적으로 변경되었습니다!');
