@@ -160,9 +160,7 @@ const ClientsPage: React.FC = () => {
 
         // data 배열에서 고객 찾기 (실제 표시되는 데이터)
         const client = data.find((c) => c.id === clientId);
-        console.log('찾은 client:', client);
-        console.log('🔍 선택된 고객 data 필드:', client?.data);
-        console.log('🔍 전체 data 배열 샘플:', data.slice(0, 1));
+        // 선택된 고객 정보 처리
 
         // fallback: clients 배열에서 찾기
         if (!client) {
@@ -424,17 +422,13 @@ const ClientsPage: React.FC = () => {
         console.log('refresh 함수 호출 시작');
         try {
             const serverResponse = await getClients();
-            console.log('🔍 서버에서 받은 클라이언트 응답 원본:', serverResponse);
-            console.log('🔍 응답 타입:', typeof serverResponse);
-            console.log('🔍 응답이 배열인가?', Array.isArray(serverResponse));
+            // 서버 응답 처리
 
             // 페이지네이션 형식인지 확인
             if (serverResponse && typeof serverResponse === 'object' && 'results' in serverResponse) {
-                console.log('📋 페이지네이션 형식 응답 감지:', serverResponse.results);
                 const serverData = Array.isArray(serverResponse.results) ? serverResponse.results : [];
-                console.log('📋 페이지네이션에서 추출한 데이터:', serverData?.length, '개');
             } else {
-                console.log('📋 직접 배열 형식 응답');
+                // 직접 배열 형식 응답
             }
 
             // 응답이 배열인지 확인하고, 페이지네이션이면 results 추출
@@ -666,17 +660,8 @@ const ClientsPage: React.FC = () => {
                     setColumns(newColumns);
                 }}
                 onAddRow={async (row) => {
-                    console.log('🆕 새 고객 추가 요청:', row);
-
-                    // 태그 데이터 확인
-                    if (row.tags || row['고객분류']) {
-                        console.log('🏷️ 추가할 태그:', row.tags || row['고객분류']);
-                    } else {
-                        console.log('🏷️ 태그 없음 - 백엔드에서 자동으로 "일반고객" 태그 할당됨');
-                    }
 
                     const result = await addClient(row);
-                    console.log('✅ 고객 추가 성공:', result);
                     // 고객 추가 후 테이블 새로고침
                     await refresh();
                 }}
@@ -686,9 +671,7 @@ const ClientsPage: React.FC = () => {
                     // await refresh();
                 }}
                 onDeleteRow={async (id) => {
-                    console.log('🚨 onDeleteRow 호출됨 - 이 콜백은 사용되지 않아야 합니다!');
-                    console.log('삭제는 onAction 콜백을 통해 모달에서 처리됩니다.');
-                    console.log('onDeleteRow 호출된 ID:', id);
+                    // onDeleteRow는 사용하지 않음 - onAction을 통한 모달 처리 사용
 
                     // 이 콜백은 사용하지 않음 - onAction을 통한 모달 처리 사용
                     return;

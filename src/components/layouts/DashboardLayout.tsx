@@ -2,7 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '@/components/dashboard/Navbar';
 import { useAuth } from '@/contexts/AuthContext';
-import { Home, Users, FileText, Mail, Settings, LogOut, PaintBucket, MessageSquare, Palette } from 'lucide-react';
+import { Home, Users, FileText, Mail, Settings, LogOut, PaintBucket, MessageSquare, Palette, User } from 'lucide-react';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -43,6 +43,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         { icon: <FileText size={20} />, label: '작품 관리', href: '/artworks' },
         { icon: <Palette size={20} />, label: '전시 준비', href: '/captions' },
         { icon: <Mail size={20} />, label: '메시지', href: '/messaging' },
+        { icon: <User size={20} />, label: '마이페이지', href: '/profile' },
         //{ icon: <Settings size={20} />, label: '설정', href: '/settings' },
     ];
 

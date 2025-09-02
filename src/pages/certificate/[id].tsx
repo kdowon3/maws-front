@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { fetchArtworkDetail } from "@/utils/api";
+import { fetchArtworkDetail, getGalleryInfo } from "@/utils/api";
 import CertificateTemplate from "@/components/artworks/CertificateTemplate";
 
 export default function CertificatePage() {
   const router = useRouter();
   const { id } = router.query;
   const [artwork, setArtwork] = useState<any | null>(null);
+  const [galleryInfo, setGalleryInfo] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,9 +15,16 @@ export default function CertificatePage() {
     if (!id) return;
     setLoading(true);
     setError(null);
-    fetchArtworkDetail(Number(id))
-      .then((data) => setArtwork(data))
-      .catch((err) => setError("작품 정보를 불러오지 못했습니다."))
+    
+    Promise.all([
+      fetchArtworkDetail(Number(id)),
+      getGalleryInfo()
+    ])
+      .then(([artworkData, galleryData]) => {
+        setArtwork(artworkData);
+        setGalleryInfo(galleryData);
+      })
+      .catch((err) => setError("정보를 불러오지 못했습니다."))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -50,6 +58,21 @@ export default function CertificatePage() {
         size={artwork.size || "-"}
         year={artwork.year || "-"}
         imageUrl={artwork.image || "/logo.png"}
+        galleryLogo={
+          galleryInfo?.logo ? (
+            <img
+              src={galleryInfo.logo}
+              alt={galleryInfo.name}
+              style={{
+                height: '100px',
+                maxWidth: '300px',
+                objectFit: 'contain'
+              }}
+            />
+          ) : (
+            galleryInfo?.name || "갤러리 로고"
+          )
+        }
       />
       <style>{`
         @media print {
