@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import MobileWarningModal from '@/components/landing/MobileWarningModal';
 
 interface DashboardData {
     user: {
@@ -75,6 +76,7 @@ const Dashboard: React.FC = () => {
     return (
         <ProtectedRoute>
             <div className="space-y-6">
+                <MobileWarningModal />
                 {/* 헤더 */}
                 <div className="bg-white shadow rounded-lg p-6">
                     <div className="flex items-center justify-between">

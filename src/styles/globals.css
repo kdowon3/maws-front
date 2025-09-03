@@ -1,0 +1,159 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 기본 스타일 설정 */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* 스크롤 동작 개선 */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* 커스텀 유틸리티 클래스 */
+@layer utilities {
+  /* 그라데이션 최적화 */
+  .gradient-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  }
+  
+  .gradient-indigo {
+    background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+  }
+
+  /* 반응형 텍스트 크기 */
+  .responsive-heading {
+    @apply text-3xl sm:text-4xl lg:text-5xl xl:text-6xl;
+  }
+
+  .responsive-subheading {
+    @apply text-lg sm:text-xl lg:text-2xl;
+  }
+
+  /* 버튼 호버 효과 개선 */
+  .button-hover-lift {
+    @apply transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  /* 카드 호버 효과 */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  /* 모바일 터치 최적화 */
+  .touch-action-manipulation {
+    touch-action: manipulation;
+  }
+}
+
+/* 모바일 전용 스타일 */
+@media (max-width: 768px) {
+  /* 모바일에서 텍스트 크기 최적화 */
+  .mobile-text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+  
+  .mobile-text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  /* 모바일에서 패딩 최적화 */
+  .mobile-px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .mobile-py-8 {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  /* 모바일에서 버튼 크기 최적화 */
+  .mobile-button {
+    min-height: 48px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* 다크모드 대응 (필요시) */
+@media (prefers-color-scheme: dark) {
+  /* 다크모드 스타일은 현재 비활성화 */
+}
+
+/* 애니메이션 최적화 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* 스크롤 애니메이션을 위한 클래스 */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.animate-on-scroll.animated {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  @apply inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin;
+}
+
+/* 접근성 개선 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 포커스 스타일 개선 */
+.focus-visible:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* 프린트 최적화 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* 고해상도 디스플레이 최적화 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* 레티나 디스플레이 최적화 스타일 */
+  .high-dpi-border {
+    border-width: 0.5px;
+  }
+}
